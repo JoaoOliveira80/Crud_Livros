@@ -7,9 +7,9 @@ interface LivroCardProps {
 }
 
 const statusConfig = {
-  QUERO_LER: { label: "Quero Ler", className: "bg-primary/10 text-primary" },
-  LENDO: { label: "Lendo", className: "bg-secondary text-white" },
-  LIDO: { label: "Lido", className: "bg-surface-container-low text-on-surface/70" },
+  QUERO_LER: { label: "Quero Ler", className: "status-quero-ler" },
+  LENDO: { label: "Lendo", className: "status-lendo" },
+  LIDO: { label: "Lido", className: "status-lido" },
 };
 
 function Estrelas({ avaliacao }: { avaliacao?: number }) {
@@ -28,7 +28,7 @@ function Estrelas({ avaliacao }: { avaliacao?: number }) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={star <= avaliacao ? "text-yellow-500" : "text-on-surface/20"}
+          className={star <= avaliacao ? "text-yellow-500" : "text-on-surface-20"}
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -54,25 +54,25 @@ export default function LivroCard({
         </span>
         <div className="flex items-center gap-2">
           {livro.status === "LIDO" && <Estrelas avaliacao={livro.avaliacao} />}
-          <span className="text-xs font-medium text-on-surface/40">{livro.ano}</span>
+          <span className="text-xs font-medium text-on-surface-40">{livro.ano}</span>
         </div>
       </div>
 
       <div>
-        <h3 className="text-xl font-serif text-primary leading-tight group-hover:text-primary-container transition-colors">
+        <h3 className="text-xl font-serif text-primary leading-tight group-hover:text-primary transition-colors">
           {livro.titulo}
         </h3>
-        <p className="text-sm font-medium text-on-surface/60 mt-1">{livro.autor}</p>
+        <p className="text-sm font-medium text-on-surface-60 mt-1">{livro.autor}</p>
       </div>
 
       {livro.descricao && (
-        <p className="text-xs text-on-surface/50 leading-relaxed line-clamp-3 italic">
+        <p className="text-xs text-on-surface-50 leading-relaxed line-clamp-3 italic">
           &ldquo;{livro.descricao}&rdquo;
         </p>
       )}
 
       <div className="flex items-center justify-between mt-auto pt-4">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface/30">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-30">
           {livro.genero}
         </span>
         <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -84,7 +84,7 @@ export default function LivroCard({
           </button>
           <button
             onClick={() => onDeletar(livro.id)}
-            className="text-xs font-bold text-on-surface/60 hover:text-red-500 transition-colors px-2 py-1"
+            className="text-xs font-bold text-on-surface-60 hover:text-red-500 transition-colors px-2 py-1"
           >
             Deletar
           </button>

@@ -175,11 +175,11 @@ export default function Home() {
 
       <main className="max-w-5xl mx-auto px-6 py-16">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-on-surface/40 font-serif italic text-xl">
+          <div className="flex items-center justify-center py-20 text-on-surface-40 font-serif italic text-xl">
             Preparando curadoria...
           </div>
         ) : livro.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface/30">
+          <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface-30">
             <span className="text-7xl font-serif italic">The empty shelf.</span>
             <p className="max-w-md text-center font-medium leading-relaxed">
               Explore sua coleção pessoal e acompanhe sua jornada literária.
@@ -197,7 +197,7 @@ export default function Home() {
                 <br />
                 <span className="italic">A curadoria é uma arte.</span>
               </h2>
-              <p className="text-on-surface/60 mt-6 leading-relaxed text-lg">
+              <p className="text-on-surface-60 mt-6 leading-relaxed text-lg">
                 Explore sua coleção pessoal e acompanhe sua jornada literária.
                 Sua estante agora conta com{" "}
                 <span className="text-primary font-bold">{livro.length}</span>{" "}
@@ -211,14 +211,14 @@ export default function Home() {
                     placeholder="Buscar por título ou autor..."
                     value={busca}
                     onChange={(e) => setBusca(e.target.value)}
-                    className="w-full bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary/30 transition-colors"
+                    className="w-full bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-30 transition-colors"
                   />
                 </div>
                 <select
                   value={generoFiltro}
                   onChange={(e) => setGeneroFiltro(e.target.value)}
                   aria-label="Filtrar por gênero"
-                  className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary/30 transition-colors cursor-pointer"
+                  className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-30 transition-colors cursor-pointer"
                 >
                   <option value="">Todos os Gêneros</option>
                   {generos.map((g) => (
@@ -249,7 +249,7 @@ export default function Home() {
                     <h3 className="text-2xl font-serif text-primary">
                       Atualmente Lendo
                     </h3>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-30">
                       {lendo.length} ATIVOS
                     </span>
                   </div>
@@ -274,7 +274,7 @@ export default function Home() {
                         <h3 className="text-2xl font-serif text-primary">
                           Próximos da Lista
                         </h3>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-30">
                           {queroLer.length} DESEJOS
                         </span>
                       </div>
@@ -327,7 +327,7 @@ export default function Home() {
 
                   {lidos.length > 0 && (
                     <div className="mt-12">
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface/30 mb-4">
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-30 mb-4">
                         Recentemente Concluídos
                       </h4>
                       <div className="flex flex-col gap-6">
@@ -336,7 +336,7 @@ export default function Home() {
                             <p className="text-sm font-serif text-primary truncate group-hover:text-primary-container transition-colors">
                               {l.titulo}
                             </p>
-                            <p className="text-[10px] text-on-surface/40 uppercase mt-0.5">
+                            <p className="text-[10px] text-on-surface-40 uppercase mt-0.5">
                               {l.autor}
                             </p>
                           </div>
@@ -376,17 +376,17 @@ export default function Home() {
                 <button
                   onClick={() => setPagina((p) => Math.max(0, p - 1))}
                   disabled={pagina === 0}
-                  className="px-4 py-2 rounded-lg border border-outline-variant/15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+                  className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
                 >
                   Anterior
                 </button>
-                <span className="text-sm text-on-surface/60 px-4">
+                <span className="text-sm text-on-surface-60 px-4">
                   {pagina + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPagina((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={pagina >= totalPages - 1}
-                  className="px-4 py-2 rounded-lg border border-outline-variant/15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+                  className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
                 >
                   Próxima
                 </button>
@@ -405,13 +405,13 @@ export default function Home() {
       )}
 
       {livroDeletando && (
-        <div className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-on-surface-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
             <div className="flex flex-col gap-2 text-center">
               <h3 className="text-2xl font-serif text-primary">
                 Remover Volume?
               </h3>
-              <p className="text-on-surface/60 text-sm leading-relaxed">
+              <p className="text-on-surface-60 text-sm leading-relaxed">
                 Você está prestes a remover{" "}
                 <span className="font-bold text-primary italic">
                   &quot;{livroDeletando.titulo}&quot;
@@ -442,7 +442,7 @@ export default function Home() {
           <span className="text-sm font-medium">{aviso}</span>
           <button
             onClick={() => setAviso("")}
-            className="text-white/60 hover:text-white"
+            className="text-white-60 hover:text-white"
           >
             ✕
           </button>

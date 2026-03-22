@@ -103,7 +103,7 @@ export default function Biblioteca() {
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div>
             <h1 className="text-5xl font-serif text-primary">Biblioteca</h1>
-            <p className="text-on-surface/60 mt-3 text-lg italic">
+            <p className="text-on-surface-60 mt-3 text-lg italic">
               Catalogação completa da sua jornada literária.
             </p>
           </div>
@@ -114,13 +114,13 @@ export default function Biblioteca() {
               placeholder="Pesquisar..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary/30 min-w-50"
+              className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary-30 min-w-50"
             />
             <select
               value={statusFiltro}
               onChange={(e) => setStatusFiltro(e.target.value)}
               aria-label="Filtrar por status"
-              className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
+              className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
               <option value="">Todos os Status</option>
               <option value="QUERO_LER">Quero Ler</option>
@@ -131,7 +131,7 @@ export default function Biblioteca() {
               value={generoFiltro}
               onChange={(e) => setGeneroFiltro(e.target.value)}
               aria-label="Filtrar por gênero"
-              className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
+              className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
               <option value="">Todos os Gêneros</option>
               {generos.map((g) => (
@@ -144,7 +144,7 @@ export default function Biblioteca() {
         </header>
 
         {loading ? (
-          <div className="py-20 text-center font-serif italic text-xl text-on-surface/40">
+          <div className="py-20 text-center font-serif italic text-xl text-on-surface-40">
             Sincronizando biblioteca...
           </div>
         ) : (
@@ -158,7 +158,7 @@ export default function Biblioteca() {
               />
             ))}
             {livrosFiltrados.length === 0 && (
-              <div className="col-span-full py-20 text-center text-on-surface/30 italic">
+              <div className="col-span-full py-20 text-center text-on-surface-30 italic">
                 Nenhum volume encontrado com os filtros atuais.
               </div>
             )}
@@ -175,13 +175,13 @@ export default function Biblioteca() {
       )}
 
       {livroDeletando && (
-        <div className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-on-surface-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
             <div className="flex flex-col gap-2 text-center">
               <h3 className="text-2xl font-serif text-primary">
                 Remover Volume?
               </h3>
-              <p className="text-on-surface/60 text-sm leading-relaxed">
+              <p className="text-on-surface-60 text-sm leading-relaxed">
                 Você está prestes a remover{" "}
                 <span className="font-bold text-primary italic">
                   &quot;{livroDeletando.titulo}&quot;
@@ -213,7 +213,7 @@ export default function Biblioteca() {
           <span className="text-sm font-medium">{aviso}</span>
           <button
             onClick={() => setAviso("")}
-            className="text-white/60 hover:text-white"
+            className="text-white-60 hover:text-white"
           >
             ✕
           </button>

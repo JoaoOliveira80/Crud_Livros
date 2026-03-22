@@ -15,11 +15,11 @@ export default function Header({ onNovo, onAviso }: HeaderProps) {
     `text-sm font-medium transition-colors ${
       pathname === path 
         ? "text-primary border-b-2 border-primary pb-1" 
-        : "text-on-surface/60 hover:text-primary"
+        : "text-on-surface-60 hover:text-primary"
     }`;
 
   return (
-    <header className="sticky top-0 z-40 glass border-b border-outline-variant/10">
+    <header className="sticky top-0 z-40 glass border-b border-outline-variant-10">
       <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
         <h1 className="text-2xl font-serif italic text-primary tracking-tight">
           Minha Estante
@@ -34,7 +34,7 @@ export default function Header({ onNovo, onAviso }: HeaderProps) {
         <div className="flex items-center gap-4">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg transition-colors hover:bg-surface-container-low text-on-surface/60 hover:text-primary"
+            className="p-2 rounded-lg transition-colors hover:bg-surface-container-low text-on-surface-60 hover:text-primary"
             aria-label={theme === "light" ? "Alternar para modo escuro" : "Alternar para modo claro"}
           >
             {theme === "light" ? (

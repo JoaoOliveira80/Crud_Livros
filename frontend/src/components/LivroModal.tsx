@@ -91,11 +91,11 @@ export default function LivroModal({
   };
 
   const inputClass =
-    "w-full bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface/30 focus:outline-none focus:border-primary/30 transition-colors font-sans";
+    "w-full bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-30 focus:outline-none focus:border-primary-30 transition-colors font-sans";
 
   return (
     <div
-      className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-on-surface-20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onFechar}
     >
       <div
@@ -107,13 +107,13 @@ export default function LivroModal({
             <h2 className="font-serif text-3xl text-primary">
               {livro ? "Editar Livro" : "Novo Livro"}
             </h2>
-            <p className="text-xs font-sans uppercase tracking-widest text-on-surface/40 mt-1">
+            <p className="text-xs font-sans uppercase tracking-widest text-on-surface-40 mt-1">
               Curadoria da sua Estante Digital
             </p>
           </div>
           <button
             onClick={onFechar}
-            className="text-on-surface/40 hover:text-on-surface transition-colors p-2"
+            className="text-on-surface-40 hover:text-on-surface transition-colors p-2"
           >
             <span className="text-2xl leading-none">✕</span>
           </button>
@@ -127,7 +127,7 @@ export default function LivroModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-1.5 md:col-span-2">
-            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
               Título do Volume
             </label>
             <input
@@ -140,7 +140,7 @@ export default function LivroModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
               Escrito por
             </label>
             <input
@@ -153,7 +153,7 @@ export default function LivroModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
               Gênero Literário
             </label>
             <input
@@ -166,7 +166,7 @@ export default function LivroModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
               Ano de Lançamento
             </label>
             <input
@@ -182,7 +182,7 @@ export default function LivroModal({
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="status-select"
-              className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1"
+              className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1"
             >
               Status de Leitura
             </label>
@@ -201,7 +201,7 @@ export default function LivroModal({
 
           {form.status === "LIDO" && (
             <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
                 Avaliação
               </label>
               <div className="flex gap-2">
@@ -223,7 +223,7 @@ export default function LivroModal({
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={star <= (form.avaliacao || 0) ? "text-yellow-500" : "text-on-surface/30"}
+                      className={star <= (form.avaliacao || 0) ? "text-yellow-500" : "text-on-surface-30"}
                     >
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
@@ -233,7 +233,7 @@ export default function LivroModal({
                   <button
                     type="button"
                     onClick={() => handleAvaliacao(0)}
-                    className="text-xs text-on-surface/50 hover:text-red-500 ml-2"
+                    className="text-xs text-on-surface-50 hover:text-red-500 ml-2"
                   >
                     Limpar
                   </button>
@@ -243,7 +243,7 @@ export default function LivroModal({
           )}
 
           <div className="flex flex-col gap-1.5 md:col-span-2">
-            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
               Breves Anotações
             </label>
             <textarea

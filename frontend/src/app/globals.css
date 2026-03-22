@@ -7,8 +7,8 @@
   --color-surface: #fbf9f4;
   --color-surface-container-low: #f5f3ee;
   --color-surface-container-lowest: #ffffff;
-  --color-primary: #103446;
-  --color-primary-container: #2a4b5d;
+  --color-primary: #2a4b5d;
+  --color-primary-container: #3d5f73;
   --color-secondary: #4a654e;
   --color-on-surface: #1b1c19;
   --color-outline-variant: #c2c7cc;
@@ -17,142 +17,205 @@
 }
 
 :root {
+  /* Modo Claro - Athenaeum Ivory */
   --surface: #fbf9f4;
   --surface-container-low: #f5f3ee;
   --surface-container-lowest: #ffffff;
-  --primary: #103446;
-  --primary-container: #2a4b5d;
+  --surface-container-high: #ffffff;
+  
+  --primary: #2a4b5d;
+  --primary-container: #d4e5ed;
+  --on-primary: #ffffff;
+  --on-primary-container: #1a3a47;
+  
   --secondary: #4a654e;
+  --secondary-container: #cde7d0;
+  --on-secondary: #ffffff;
+  --on-secondary-container: #1e4620;
+  
   --on-surface: #1b1c19;
   --on-surface-variant: #45483d;
   --outline-variant: #c2c7cc;
-  --on-primary: #ffffff;
-  --surface-dim: #d8d7d2;
-  --surface-bright: #fbf9f4;
+  
+  /* Status Colors - Modo Claro */
+  --status-quero-ler: #d1e9ff;
+  --status-quero-ler-text: #1a3a5c;
+  --status-lendo: #cde7d0;
+  --status-lendo-text: #1e4620;
+  --status-lido: #eac2b5;
+  --status-lido-text: #5c3a2a;
+  
+  --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
 }
 
 [data-theme="dark"] {
-  --surface: #1a1c19;
-  --surface-container-low: #252622;
-  --surface-container-lowest: #1f211e;
-  --primary: #a4c8da;
-  --primary-container: #3d5f73;
-  --secondary: #b0cbb0;
-  --on-surface: #e2e3de;
-  --on-surface-variant: #c2c7bc;
+  /* Modo Escuro - Athenaeum Obsidian */
+  --surface: #121212;
+  --surface-container-low: #1e1e1e;
+  --surface-container-lowest: #2a2a2a;
+  --surface-container-high: #333333;
+  
+  --primary: #7ea8b8;
+  --primary-container: #1e3a47;
+  --on-primary: #121212;
+  --on-primary-container: #c5e4ed;
+  
+  --secondary: #8fb896;
+  --secondary-container: #1e4620;
+  --on-secondary: #121212;
+  --on-secondary-container: #b4dcc0;
+  
+  --on-surface: #e8e8e6;
+  --on-surface-variant: #a8a8a0;
   --outline-variant: #44483d;
-  --on-primary: #1a1c19;
-  --surface-dim: #1a1c19;
-  --surface-bright: #2f312e;
+  
+  /* Status Colors - Modo Escuro */
+  --status-quero-ler: #1a3a5c;
+  --status-quero-ler-text: #a8d4ff;
+  --status-lendo: #1e4620;
+  --status-lendo-text: #b4dcc0;
+  --status-lido: #5c3a2a;
+  --status-lido-text: #ffcbb3;
+  
+  --shadow-ambient: 0 8px 40px rgba(0, 0, 0, 0.4);
 }
 
 @layer base {
   body {
-    @apply bg-surface text-on-surface font-sans selection:bg-primary/10 transition-colors duration-300;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, .font-serif {
-    @apply font-serif;
+    font-family: var(--font-serif);
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-surface/80 backdrop-blur-md;
-  }
-
-  .btn-primary {
-    @apply bg-linear-to-br from-primary to-primary-container text-white px-6 py-2.5 rounded-md font-bold transition-all hover:brightness-110 active:scale-95 shadow-sm;
-  }
-
-  .btn-secondary {
-    @apply border border-outline-variant/15 text-on-surface px-6 py-2.5 rounded-md font-medium transition-all hover:bg-surface-container-low hover:border-outline-variant/30;
-  }
-
-  .ghost-border {
-    @apply border border-outline-variant/15;
-  }
-
-  .card-ambient {
-    @apply bg-surface-container-lowest shadow-ambient rounded-lg;
-  }
-
-  .text-primary {
-    color: var(--primary);
-  }
-
-  .text-on-surface {
-    color: var(--on-surface);
-  }
-
-  .text-on-surface\/40 {
-    color: color-mix(in srgb, var(--on-surface) 40%, transparent);
-  }
-
-  .text-on-surface\/50 {
-    color: color-mix(in srgb, var(--on-surface) 50%, transparent);
-  }
-
-  .text-on-surface\/60 {
-    color: color-mix(in srgb, var(--on-surface) 60%, transparent);
-  }
-
-  .text-on-surface\/70 {
-    color: color-mix(in srgb, var(--on-surface) 70%, transparent);
-  }
-
-  .bg-surface {
-    background-color: var(--surface);
-  }
-
-  .bg-surface-container-low {
-    background-color: var(--surface-container-low);
-  }
-
-  .bg-surface-container-lowest {
-    background-color: var(--surface-container-lowest);
-  }
-
-  .bg-surface-container-low\/80 {
     background-color: color-mix(in srgb, var(--surface-container-low) 80%, transparent);
-  }
-
-  .bg-surface-container-low\/40 {
-    background-color: color-mix(in srgb, var(--surface-container-low) 40%, transparent);
-  }
-
-  .bg-surface-container-low\/20 {
-    background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent);
-  }
-
-  .bg-on-surface\/20 {
-    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
-  }
-
-  .bg-on-surface\/20 {
-    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
-  }
-
-  .border-outline-variant\/15 {
-    border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent);
-  }
-
-  .border-outline-variant\/30 {
-    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
-  }
-
-  .border-outline-variant\/10 {
-    border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent);
-  }
-
-  .shadow-ambient {
-    box-shadow: 0 8px 40px color-mix(in srgb, var(--on-surface) 6%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .btn-primary {
     background: linear-gradient(to bottom right, var(--primary), var(--primary-container));
     color: var(--on-primary);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--outline-variant);
+    color: var(--on-surface);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--surface-container-low);
+    border-color: var(--on-surface-variant);
+  }
+
+  .card-ambient {
+    background-color: var(--surface-container-lowest);
+    box-shadow: var(--shadow-ambient);
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-ambient:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px color-mix(in srgb, var(--on-surface) 10%, transparent);
+  }
+
+  /* Custom utility classes for opacity */
+  .text-primary { color: var(--primary); }
+  .bg-primary { background-color: var(--primary); }
+  .bg-primary-container { background-color: var(--primary-container); }
+  .text-primary-container { color: var(--primary-container); }
+  
+  .text-on-surface { color: var(--on-surface); }
+  .bg-on-surface { background-color: var(--on-surface); }
+  
+  .text-on-surface-40 { color: color-mix(in srgb, var(--on-surface) 40%, transparent); }
+  .text-on-surface-50 { color: color-mix(in srgb, var(--on-surface) 50%, transparent); }
+  .text-on-surface-60 { color: color-mix(in srgb, var(--on-surface) 60%, transparent); }
+  .text-on-surface-70 { color: color-mix(in srgb, var(--on-surface) 70%, transparent); }
+  .text-on-surface-30 { color: color-mix(in srgb, var(--on-surface) 30%, transparent); }
+  .text-on-surface-20 { color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
+  
+  .bg-surface-container-low { background-color: var(--surface-container-low); }
+  
+  .bg-on-surface-20 { background-color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
+  .bg-surface-container-low\/20 { background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent); }
+  
+  .bg-surface { background-color: var(--surface); }
+  .bg-surface-container-low { background-color: var(--surface-container-low); }
+  .bg-surface-container-lowest { background-color: var(--surface-container-lowest); }
+  .bg-surface-container-high { background-color: var(--surface-container-high); }
+  
+  .bg-surface-container-low-80 { background-color: color-mix(in srgb, var(--surface-container-low) 80%, transparent); }
+  .bg-surface-container-low-40 { background-color: color-mix(in srgb, var(--surface-container-low) 40%, transparent); }
+  .bg-surface-container-low-20 { background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent); }
+  
+  .bg-on-surface-20 { background-color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
+  
+  .border-outline-variant { border-color: var(--outline-variant); }
+  .border-outline-variant-15 { border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent); }
+  .border-outline-variant-30 { border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent); }
+  .border-outline-variant-10 { border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent); }
+  
+  .border-primary { border-color: var(--primary); }
+  .border-primary-30 { border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
+  
+  .hover\:bg-surface-container-low:hover { background-color: var(--surface-container-low); }
+  
+  /* White variations for dark mode */
+  .bg-white { background-color: var(--surface-container-lowest); }
+  .text-white { color: #ffffff; }
+  .text-white-60 { color: color-mix(in srgb, #ffffff 60%, transparent); }
+  
+  .hover\:text-white:hover { color: #ffffff; }
+  .hover\:text-red-500:hover { color: #ef4444; }
+  
+  .shadow-ambient { box-shadow: var(--shadow-ambient); }
+
+  /* Status badges */
+  .status-quero-ler {
+    background-color: var(--status-quero-ler);
+    color: var(--status-quero-ler-text);
+  }
+  
+  .status-lendo {
+    background-color: var(--status-lendo);
+    color: var(--status-lendo-text);
+  }
+  
+  .status-lido {
+    background-color: var(--status-lido);
+    color: var(--status-lido-text);
   }
 }

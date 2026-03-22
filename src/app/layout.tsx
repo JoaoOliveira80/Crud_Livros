@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Newsreader, Manrope } from "next/font/google";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 
 export const metadata: Metadata = {
   title: "Minha Estante",
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geist.variable} ${geistMono.variable} bg-zinc-950 text-zinc-100 antialiased`}
+        className={`${newsreader.variable} ${manrope.variable} antialiased`}
       >
         {children}
       </body>

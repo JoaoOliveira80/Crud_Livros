@@ -7,9 +7,9 @@ interface LivroCardProps {
 }
 
 const statusConfig = {
-  QUERO_LER: { label: "Quero Ler", className: "bg-blue-500/10 text-blue-400" },
-  LENDO: { label: "Lendo", className: "bg-amber-500/10 text-amber-400" },
-  LIDO: { label: "Lido", className: "bg-emerald-500/10 text-emerald-400" },
+  QUERO_LER: { label: "Quero Ler", className: "bg-primary/10 text-primary" },
+  LENDO: { label: "Lendo", className: "bg-secondary text-white" },
+  LIDO: { label: "Lido", className: "bg-surface-container-low text-on-surface/70" },
 };
 
 export default function LivroCard({
@@ -20,43 +20,43 @@ export default function LivroCard({
   const status = statusConfig[livro.status];
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex flex-col gap-3 hover:border-zinc-700 transition-colors">
+    <div className="card-ambient p-6 flex flex-col gap-4 hover:translate-y-[-4px] transition-all duration-300 group">
       <div className="flex items-start justify-between gap-2">
         <span
-          className={`text-xs font-medium px-2.5 py-1 rounded-md ${status.className}`}
+          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${status.className}`}
         >
           {status.label}
         </span>
-        <span className="text-xs text-zinc-500">{livro.ano}</span>
+        <span className="text-xs font-medium text-on-surface/40">{livro.ano}</span>
       </div>
 
       <div>
-        <h3 className="font-semibold text-zinc-100 leading-snug">
+        <h3 className="text-xl font-serif text-primary leading-tight group-hover:text-primary-container transition-colors">
           {livro.titulo}
         </h3>
-        <p className="text-sm text-zinc-400 mt-0.5">{livro.autor}</p>
+        <p className="text-sm font-medium text-on-surface/60 mt-1">{livro.autor}</p>
       </div>
 
       {livro.descricao && (
-        <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">
-          {livro.descricao}
+        <p className="text-xs text-on-surface/50 leading-relaxed line-clamp-3 italic">
+          &ldquo;{livro.descricao}&rdquo;
         </p>
       )}
 
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-zinc-800">
-        <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">
+      <div className="flex items-center justify-between mt-auto pt-4">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface/30">
           {livro.genero}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEditar(livro)}
-            className="text-xs text-zinc-400 border border-zinc-700 px-3 py-1 rounded-md hover:text-emerald-400 hover:border-emerald-400 transition-colors"
+            className="text-xs font-bold text-primary hover:underline"
           >
             Editar
           </button>
           <button
             onClick={() => onDeletar(livro.id)}
-            className="text-xs text-zinc-500 border border-zinc-800 px-3 py-1 rounded-md hover:text-red-400 hover:border-red-400 transition-colors"
+            className="text-xs font-bold text-on-surface/40 hover:text-red-500 transition-colors"
           >
             Deletar
           </button>

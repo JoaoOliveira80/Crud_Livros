@@ -74,39 +74,44 @@ export default function LivroModal({
   };
 
   const inputClass =
-    "w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-emerald-400 transition-colors";
+    "w-full bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface/30 focus:outline-none focus:border-primary/30 transition-colors font-sans";
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onFechar}
     >
       <div
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 flex flex-col gap-5"
+        className="bg-surface border-none shadow-ambient rounded-2xl w-full max-w-lg p-8 flex flex-col gap-8 transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">
-            {livro ? "Editar Livro" : "Novo Livro"}
-          </h2>
+          <div>
+            <h2 className="font-serif text-3xl text-primary">
+              {livro ? "Editar Livro" : "Novo Livro"}
+            </h2>
+            <p className="text-xs font-sans uppercase tracking-widest text-on-surface/40 mt-1">
+              Curadoria da sua Estante Digital
+            </p>
+          </div>
           <button
             onClick={onFechar}
-            className="text-zinc-500 hover:text-zinc-200 transition-colors text-lg leading-none"
+            className="text-on-surface/40 hover:text-on-surface transition-colors p-2"
           >
-            ✕
+            <span className="text-2xl leading-none">✕</span>
           </button>
         </div>
 
         {erro && (
-          <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 px-3 py-2 rounded-lg">
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-lg">
             {erro}
           </p>
         )}
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400 uppercase tracking-wide">
-              Título *
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              Título do Volume
             </label>
             <input
               name="titulo"
@@ -118,8 +123,8 @@ export default function LivroModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400 uppercase tracking-wide">
-              Autor *
+            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              Escrito por
             </label>
             <input
               name="autor"
@@ -130,47 +135,46 @@ export default function LivroModal({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400 uppercase tracking-wide">
-                Gênero *
-              </label>
-              <input
-                name="genero"
-                value={form.genero}
-                onChange={handleChange}
-                placeholder="Ex: Romance"
-                className={inputClass}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400 uppercase tracking-wide">
-                Ano *
-              </label>
-              <input
-                name="ano"
-                type="number"
-                value={form.ano}
-                onChange={handleChange}
-                placeholder="Ex: 1899"
-                className={inputClass}
-              />
-            </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              Gênero Literário
+            </label>
+            <input
+              name="genero"
+              value={form.genero}
+              onChange={handleChange}
+              placeholder="Ex: Realismo"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              Ano de Lançamento
+            </label>
+            <input
+              name="ano"
+              type="number"
+              value={form.ano}
+              onChange={handleChange}
+              placeholder="Ex: 1899"
+              className={inputClass}
+            />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="status-select"
-              className="text-xs text-zinc-400 uppercase tracking-wide"
+              className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1"
             >
-              Status
+              Status de Leitura
             </label>
             <select
               id="status-select"
               name="status"
               value={form.status}
               onChange={handleChange}
-              className={inputClass}
+              className={`${inputClass} appearance-none cursor-pointer`}
             >
               <option value="QUERO_LER">Quero Ler</option>
               <option value="LENDO">Lendo</option>
@@ -178,34 +182,34 @@ export default function LivroModal({
             </select>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400 uppercase tracking-wide">
-              Descrição
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+              Breves Anotações
             </label>
             <textarea
               name="descricao"
               value={form.descricao}
               onChange={handleChange}
-              placeholder="Uma breve sinopse..."
+              placeholder="Impressões sobre o livro..."
               rows={3}
               className={`${inputClass} resize-none`}
             />
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 pt-1">
+        <div className="flex justify-end gap-4 pt-4">
           <button
             onClick={onFechar}
-            className="text-sm text-zinc-400 border border-zinc-700 px-4 py-2 rounded-lg hover:text-zinc-100 transition-colors"
+            className="btn-secondary"
           >
-            Cancelar
+            Manter na estante
           </button>
           <button
             onClick={handleSubmit}
             disabled={salvando}
-            className="text-sm font-medium bg-emerald-400 text-zinc-950 px-4 py-2 rounded-lg hover:bg-emerald-300 transition-colors disabled:opacity-50"
+            className="btn-primary min-w-[140px]"
           >
-            {salvando ? "Salvando..." : livro ? "Salvar" : "Criar"}
+            {salvando ? "Curando..." : livro ? "Salvar Volume" : "Catalogar Livro"}
           </button>
         </div>
       </div>

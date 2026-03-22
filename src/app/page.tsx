@@ -71,75 +71,133 @@ export default function Home() {
     <>
       <Header onNovo={abrirNovo} />
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="max-w-5xl mx-auto px-6 py-16">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-zinc-500">
-            Carregando...
+          <div className="flex items-center justify-center py-20 text-on-surface/40 font-serif italic text-xl">
+            Preparando curadoria...
           </div>
         ) : livros.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-zinc-500">
-            <span className="text-4xl">◇</span>
-            <p>Nenhum livro cadastrado ainda.</p>
+          <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface/30">
+            <span className="text-7xl font-serif italic">The empty shelf.</span>
+            <p className="max-w-md text-center font-medium leading-relaxed">
+              Explore sua coleção pessoal e acompanhe sua jornada literária. Cada livro é uma janela para um novo mundo.
+            </p>
             <button
               onClick={abrirNovo}
-              className="text-sm text-emerald-400 hover:underline"
+              className="btn-primary mt-4"
             >
-              Adicionar o primeiro
+              Adicionar o primeiro volume
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-10">
-            {lendo.length > 0 && (
-              <section>
-                <h2 className="text-xs font-medium text-amber-400 uppercase tracking-widest mb-4">
-                  Lendo agora — {lendo.length}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {lendo.map((l) => (
-                    <LivroCard
-                      key={l.id}
-                      livro={l}
-                      onEditar={abrirEditar}
-                      onDeletar={handleDeletar}
-                    />
-                  ))}
+          <div className="flex flex-col gap-24">
+            <header className="max-w-3xl">
+              <h2 className="text-[3.5rem] font-serif leading-[1.1] text-primary tracking-tight">
+                Boa leitura,<br/>
+                <span className="italic">Curation is an art.</span>
+              </h2>
+              <p className="text-on-surface/60 mt-6 leading-relaxed text-lg">
+                Explore sua coleção pessoal e acompanhe sua jornada literária. 
+                Sua estante agora conta com <span className="text-primary font-bold">{livros.length}</span> volumes catalogados.
+              </p>
+            </header>
+
+            <div className="flex flex-col gap-20">
+              {lendo.length > 0 && (
+                <section>
+                  <div className="flex items-baseline justify-between mb-8">
+                    <h3 className="text-2xl font-serif text-primary">Atualmente Lendo</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
+                      {lendo.length} ATIVOS
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {lendo.map((l) => (
+                      <LivroCard
+                        key={l.id}
+                        livro={l}
+                        onEditar={abrirEditar}
+                        onDeletar={handleDeletar}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <div className="lg:col-span-8">
+                  {queroLer.length > 0 && (
+                    <section>
+                      <div className="flex items-baseline justify-between mb-8">
+                        <h3 className="text-2xl font-serif text-primary">Próximos da Lista</h3>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
+                          {queroLer.length} DESEJOS
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {queroLer.map((l) => (
+                          <LivroCard
+                            key={l.id}
+                            livro={l}
+                            onEditar={abrirEditar}
+                            onDeletar={handleDeletar}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
                 </div>
-              </section>
-            )}
-            {queroLer.length > 0 && (
-              <section>
-                <h2 className="text-xs font-medium text-blue-400 uppercase tracking-widest mb-4">
-                  Quero Ler — {queroLer.length}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {queroLer.map((l) => (
-                    <LivroCard
-                      key={l.id}
-                      livro={l}
-                      onEditar={abrirEditar}
-                      onDeletar={handleDeletar}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-            {lidos.length > 0 && (
-              <section>
-                <h2 className="text-xs font-medium text-emerald-400 uppercase tracking-widest mb-4">
-                  Lidos — {lidos.length}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {lidos.map((l) => (
-                    <LivroCard
-                      key={l.id}
-                      livro={l}
-                      onEditar={abrirEditar}
-                      onDeletar={handleDeletar}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
+
+                <aside className="lg:col-span-4 bg-surface-container-low p-8 rounded-2xl h-fit sticky top-28">
+                  <h3 className="text-xl font-serif text-primary mb-6">Quick Actions</h3>
+                  <div className="flex flex-col gap-3">
+                    <button onClick={abrirNovo} className="btn-primary w-full text-sm">
+                      + Add New Book
+                    </button>
+                    <button className="btn-secondary w-full text-sm">
+                      Browse Library
+                    </button>
+                  </div>
+                  
+                  {lidos.length > 0 && (
+                    <div className="mt-12">
+                      <h4 className="text-xs font-bold uppercase tracking-[0.1em] text-on-surface/30 mb-4">
+                        Recentemente Concluídos
+                      </h4>
+                      <div className="flex flex-col gap-6">
+                        {lidos.slice(0, 3).map(l => (
+                          <div key={l.id} className="group cursor-pointer">
+                            <p className="text-sm font-serif text-primary truncate group-hover:text-primary-container transition-colors">
+                              {l.titulo}
+                            </p>
+                            <p className="text-[10px] text-on-surface/40 uppercase mt-0.5">{l.autor}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </aside>
+              </div>
+
+              {lidos.length > 3 && (
+                <section>
+                  <div className="flex items-baseline justify-between mb-8">
+                    <h3 className="text-2xl font-serif text-primary">Histórico de Leitura</h3>
+                    <button className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">Ver Todos</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {lidos.slice(3).map((l) => (
+                      <LivroCard
+                        key={l.id}
+                        livro={l}
+                        onEditar={abrirEditar}
+                        onDeletar={handleDeletar}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
           </div>
         )}
       </main>

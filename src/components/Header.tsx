@@ -4,19 +4,21 @@ interface HeaderProps {
 
 export default function Header({ onNovo }: HeaderProps) {
   return (
-    <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-10">
-      <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-emerald-400 text-xl">◈</span>
-          <span className="font-semibold text-lg tracking-tight">
-            Minha Estante
-          </span>
-        </div>
-        <button
-          onClick={onNovo}
-          className="bg-emerald-400 text-zinc-950 text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-emerald-300 transition-colors"
-        >
-          + Novo Livro
+    <header className="sticky top-0 z-40 glass border-b border-outline-variant/10">
+      <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+        <h1 className="text-2xl font-serif italic text-primary tracking-tight">
+          Minha Estante
+        </h1>
+        
+        <nav className="hidden md:flex items-center gap-8 mr-auto ml-12">
+          <a href="#" className="text-sm font-medium text-primary border-b-2 border-primary pb-1">Dashboard</a>
+          <a href="#" className="text-sm font-medium text-on-surface/60 hover:text-primary transition-colors">Minha Biblioteca</a>
+          <a href="#" className="text-sm font-medium text-on-surface/60 hover:text-primary transition-colors">Configurações</a>
+        </nav>
+
+        <button onClick={onNovo} className="btn-primary flex items-center gap-2">
+          <span className="text-lg leading-none">+</span>
+          Adicionar Livro
         </button>
       </div>
     </header>

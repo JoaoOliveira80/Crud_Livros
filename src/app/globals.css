@@ -1,2 +1,51 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-newsreader);
+  --font-sans: var(--font-manrope);
+
+  --color-surface: #fbf9f4;
+  --color-surface-container-low: #f5f3ee;
+  --color-surface-container-lowest: #ffffff;
+  --color-primary: #103446;
+  --color-primary-container: #2a4b5d;
+  --color-secondary: #4a654e;
+  --color-on-surface: #1b1c19;
+  --color-outline-variant: #c2c7cc;
+
+  --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-sans selection:bg-primary/10 transition-colors duration-300;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface/80 backdrop-blur-md;
+  }
+
+  .btn-primary {
+    @apply bg-linear-to-br from-primary to-primary-container text-white px-6 py-2.5 rounded-md font-bold transition-all hover:brightness-110 active:scale-95 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply border border-outline-variant/15 text-on-surface px-6 py-2.5 rounded-md font-medium transition-all hover:bg-surface-container-low hover:border-outline-variant/30;
+  }
+
+  .ghost-border {
+    @apply border border-outline-variant/15;
+  }
+
+  .card-ambient {
+    @apply bg-surface-container-lowest shadow-ambient rounded-lg;
+  }
+}

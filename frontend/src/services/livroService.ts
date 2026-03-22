@@ -1,10 +1,27 @@
-import { Livro, LivroForm } from "../types/livros";
+import { Livro, LivroForm, PageResponse } from "../types/livros";
 
 const BASE_URL = "http://localhost:8080/api/livros";
 
 export const livroService = {
   async listarTodos(): Promise<Livro[]> {
     const res = await fetch(BASE_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("Erro ao buscar livros");
+    return res.json();
+  },
+
+  async listarPaginado(
+    page: number,
+    size: number = 12,
+    sortBy: string = "createdAt",
+    sortDir: "asc" | "desc" = "desc"
+  ): Promise<PageResponse<Livro>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+      sortBy,
+      sortDir,
+    });
+    const res = await fetch(`${BASE_URL}/paginado?${params}`, { cache: "no-store" });
     if (!res.ok) throw new Error("Erro ao buscar livros");
     return res.json();
   },
@@ -44,5 +61,14 @@ export const livroService = {
   async deletar(id: number): Promise<void> {
     const res = await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Erro ao deletar livro");
+  },
+
+  async importar(livros: Partial<LivroForm>[]): Promise<Livro[]> {
+    const criados: Livro[] = [];
+    for (const livro of livros) {
+      const criado = await this.criar(livro as LivroForm);
+      criados.push(criado);
+    }
+    return criados;
   },
 };

@@ -16,6 +16,7 @@ const formInicial: LivroForm = {
   ano: "",
   descricao: "",
   status: "QUERO_LER",
+  avaliacao: undefined,
 };
 
 export default function LivroModal({
@@ -36,6 +37,7 @@ export default function LivroModal({
         ano: livro.ano,
         descricao: livro.descricao || "",
         status: livro.status,
+        avaliacao: livro.avaliacao,
       });
     } else {
       setForm(formInicial);
@@ -48,7 +50,22 @@ export default function LivroModal({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    if (name === "ano") {
+      setForm((prev) => ({ ...prev, [name]: value === "" ? "" : Number(value) }));
+    } else if (name === "status") {
+      setForm((prev) => ({
+        ...prev,
+        status: value as Status,
+        avaliacao: value === "LIDO" ? prev.avaliacao : undefined,
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleAvaliacao = (value: number) => {
+    setForm((prev) => ({ ...prev, avaliacao: value }));
   };
 
   const handleSubmit = async () => {
@@ -181,6 +198,49 @@ export default function LivroModal({
               <option value="LIDO">Lido</option>
             </select>
           </div>
+
+          {form.status === "LIDO" && (
+            <div className="flex flex-col gap-1.5 md:col-span-2">
+              <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">
+                Avaliação
+              </label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => handleAvaliacao(star)}
+                    className="p-1 transition-transform hover:scale-110"
+                    aria-label={`Avaliar com ${star} estrela${star > 1 ? "s" : ""}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill={star <= (form.avaliacao || 0) ? "#eab308" : "none"}
+                      stroke={star <= (form.avaliacao || 0) ? "#eab308" : "currentColor"}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={star <= (form.avaliacao || 0) ? "text-yellow-500" : "text-on-surface/30"}
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                ))}
+                {form.avaliacao !== undefined && (
+                  <button
+                    type="button"
+                    onClick={() => handleAvaliacao(0)}
+                    className="text-xs text-on-surface/50 hover:text-red-500 ml-2"
+                  >
+                    Limpar
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1.5 md:col-span-2">
             <label className="text-[10px] font-bold text-on-surface/40 uppercase tracking-widest ml-1">

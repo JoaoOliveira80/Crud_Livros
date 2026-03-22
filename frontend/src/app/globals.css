@@ -16,6 +16,36 @@
   --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
 }
 
+:root {
+  --surface: #fbf9f4;
+  --surface-container-low: #f5f3ee;
+  --surface-container-lowest: #ffffff;
+  --primary: #103446;
+  --primary-container: #2a4b5d;
+  --secondary: #4a654e;
+  --on-surface: #1b1c19;
+  --on-surface-variant: #45483d;
+  --outline-variant: #c2c7cc;
+  --on-primary: #ffffff;
+  --surface-dim: #d8d7d2;
+  --surface-bright: #fbf9f4;
+}
+
+[data-theme="dark"] {
+  --surface: #1a1c19;
+  --surface-container-low: #252622;
+  --surface-container-lowest: #1f211e;
+  --primary: #a4c8da;
+  --primary-container: #3d5f73;
+  --secondary: #b0cbb0;
+  --on-surface: #e2e3de;
+  --on-surface-variant: #c2c7bc;
+  --outline-variant: #44483d;
+  --on-primary: #1a1c19;
+  --surface-dim: #1a1c19;
+  --surface-bright: #2f312e;
+}
+
 @layer base {
   body {
     @apply bg-surface text-on-surface font-sans selection:bg-primary/10 transition-colors duration-300;
@@ -47,5 +77,82 @@
 
   .card-ambient {
     @apply bg-surface-container-lowest shadow-ambient rounded-lg;
+  }
+
+  .text-primary {
+    color: var(--primary);
+  }
+
+  .text-on-surface {
+    color: var(--on-surface);
+  }
+
+  .text-on-surface\/40 {
+    color: color-mix(in srgb, var(--on-surface) 40%, transparent);
+  }
+
+  .text-on-surface\/50 {
+    color: color-mix(in srgb, var(--on-surface) 50%, transparent);
+  }
+
+  .text-on-surface\/60 {
+    color: color-mix(in srgb, var(--on-surface) 60%, transparent);
+  }
+
+  .text-on-surface\/70 {
+    color: color-mix(in srgb, var(--on-surface) 70%, transparent);
+  }
+
+  .bg-surface {
+    background-color: var(--surface);
+  }
+
+  .bg-surface-container-low {
+    background-color: var(--surface-container-low);
+  }
+
+  .bg-surface-container-lowest {
+    background-color: var(--surface-container-lowest);
+  }
+
+  .bg-surface-container-low\/80 {
+    background-color: color-mix(in srgb, var(--surface-container-low) 80%, transparent);
+  }
+
+  .bg-surface-container-low\/40 {
+    background-color: color-mix(in srgb, var(--surface-container-low) 40%, transparent);
+  }
+
+  .bg-surface-container-low\/20 {
+    background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent);
+  }
+
+  .bg-on-surface\/20 {
+    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+  }
+
+  .bg-on-surface\/20 {
+    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+  }
+
+  .border-outline-variant\/15 {
+    border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent);
+  }
+
+  .border-outline-variant\/30 {
+    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
+  }
+
+  .border-outline-variant\/10 {
+    border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent);
+  }
+
+  .shadow-ambient {
+    box-shadow: 0 8px 40px color-mix(in srgb, var(--on-surface) 6%, transparent);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to bottom right, var(--primary), var(--primary-container));
+    color: var(--on-primary);
   }
 }

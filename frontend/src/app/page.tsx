@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Livro, LivroForm } from "@/types/livros";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Livro, LivroForm, PageResponse } from "@/types/livros";
 import { livroService } from "@/services/livroService";
 import Header from "@/components/Header";
 import LivroCard from "@/components/LivroCard";
 import LivroModal from "@/components/LivroModal";
 
+const PAGE_SIZE = 12;
+
 export default function Home() {
-  const [livros, setLivros] = useState<Livro[]>([]);
+  const [pagina, setPagina] = useState(0);
+  const [pageData, setPageData] = useState<PageResponse<Livro> | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [livroEditando, setLivroEditando] = useState<Livro | null>(null);
@@ -16,18 +19,20 @@ export default function Home() {
   const [busca, setBusca] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState("");
   const [aviso, setAviso] = useState("");
+  const [importando, setImportando] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const carregarLivros = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await livroService.listarTodos();
-      setLivros(data);
+      const data = await livroService.listarPaginado(pagina, PAGE_SIZE);
+      setPageData(data);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pagina]);
 
   useEffect(() => {
     carregarLivros();
@@ -51,12 +56,25 @@ export default function Home() {
   const handleSalvar = async (dados: LivroForm) => {
     if (livroEditando) {
       const atualizado = await livroService.atualizar(livroEditando.id, dados);
-      setLivros((prev) =>
-        prev.map((l) => (l.id === livroEditando.id ? atualizado : l)),
-      );
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: prev.content.map((l) =>
+            l.id === livroEditando.id ? atualizado : l
+          ),
+        };
+      });
     } else {
       const criado = await livroService.criar(dados);
-      setLivros((prev) => [criado, ...prev]);
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: [criado, ...prev.content],
+          totalElements: prev.totalElements + 1,
+        };
+      });
     }
     fecharModal();
   };
@@ -67,7 +85,7 @@ export default function Home() {
   };
 
   const prepararDelecao = (id: number) => {
-    const livro = livros.find((l) => l.id === id);
+    const livro = pageData?.content.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
   };
 
@@ -75,7 +93,15 @@ export default function Home() {
     if (!livroDeletando) return;
     try {
       await livroService.deletar(livroDeletando.id);
-      setLivros((prev) => prev.filter((l) => l.id !== livroDeletando.id));
+      setPageData((prev) => {
+        if (!prev) return prev;
+        const filtered = prev.content.filter((l) => l.id !== livroDeletando.id);
+        return {
+          ...prev,
+          content: filtered,
+          totalElements: prev.totalElements - 1,
+        };
+      });
       setLivroDeletando(null);
     } catch (err) {
       console.error("Erro ao deletar:", err);
@@ -83,7 +109,7 @@ export default function Home() {
     }
   };
 
-  const livrosFiltrados = livros.filter((l) => {
+  const livrosFiltrados = (pageData?.content || []).filter((l) => {
     const matchesBusca =
       l.titulo.toLowerCase().includes(busca.toLowerCase()) ||
       l.autor.toLowerCase().includes(busca.toLowerCase());
@@ -91,11 +117,57 @@ export default function Home() {
     return matchesBusca && matchesGenero;
   });
 
-  const generos = Array.from(new Set(livros.map((l) => l.genero)));
+  const generos = Array.from(new Set((pageData?.content || []).map((l) => l.genero)));
 
-  const queroLer = livrosFiltrados.filter((l) => l.status === "QUERO_LER");
-  const lendo = livrosFiltrados.filter((l) => l.status === "LENDO");
-  const lidos = livrosFiltrados.filter((l) => l.status === "LIDO");
+  const totalPages = pageData?.totalPages || 1;
+
+  const exportarJSON = () => {
+    if (!pageData?.content) return;
+    const dataStr = JSON.stringify(pageData.content, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `minha-estante-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    mostrarAviso("Biblioteca exportada com sucesso!");
+  };
+
+  const importarJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportando(true);
+    try {
+      const text = await file.text();
+      const livros = JSON.parse(text);
+      const criados = await livroService.importar(livros);
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: [...criados, ...(prev.content || [])],
+          totalElements: prev.totalElements + criados.length,
+        };
+      });
+      mostrarAviso(`${criados.length} livros importados com sucesso!`);
+    } catch (err) {
+      console.error("Erro ao importar:", err);
+      alert("Erro ao importar arquivo. Verifique o formato.");
+    } finally {
+      setImportando(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const livro =
+    busca || generoFiltro
+      ? livrosFiltrados
+      : pageData?.content || [];
+
+  const queroLer = livro.filter((l) => l.status === "QUERO_LER");
+  const lendo = livro.filter((l) => l.status === "LENDO");
+  const lidos = livro.filter((l) => l.status === "LIDO");
 
   return (
     <>
@@ -106,7 +178,7 @@ export default function Home() {
           <div className="flex items-center justify-center py-20 text-on-surface/40 font-serif italic text-xl">
             Preparando curadoria...
           </div>
-        ) : livros.length === 0 ? (
+        ) : livro.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface/30">
             <span className="text-7xl font-serif italic">The empty shelf.</span>
             <p className="max-w-md text-center font-medium leading-relaxed">
@@ -128,7 +200,7 @@ export default function Home() {
               <p className="text-on-surface/60 mt-6 leading-relaxed text-lg">
                 Explore sua coleção pessoal e acompanhe sua jornada literária.
                 Sua estante agora conta com{" "}
-                <span className="text-primary font-bold">{livros.length}</span>{" "}
+                <span className="text-primary font-bold">{livro.length}</span>{" "}
                 volumes catalogados.
               </p>
 
@@ -232,13 +304,25 @@ export default function Home() {
                       + Novo Volume
                     </button>
                     <button
-                      onClick={() =>
-                        mostrarAviso("Funcionalidade em desenvolvimento")
-                      }
+                      onClick={exportarJSON}
                       className="btn-secondary w-full text-sm"
                     >
-                      Ver Biblioteca
+                      ↓ Exportar Biblioteca
                     </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={importando}
+                      className="btn-secondary w-full text-sm disabled:opacity-50"
+                    >
+                      {importando ? "Importando..." : "↑ Importar Biblioteca"}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".json"
+                      onChange={importarJSON}
+                      className="hidden"
+                    />
                   </div>
 
                   {lidos.length > 0 && (
@@ -286,6 +370,28 @@ export default function Home() {
                 </section>
               )}
             </div>
+
+            {totalPages > 1 && !busca && !generoFiltro && (
+              <div className="flex items-center justify-center gap-2 mt-16">
+                <button
+                  onClick={() => setPagina((p) => Math.max(0, p - 1))}
+                  disabled={pagina === 0}
+                  className="px-4 py-2 rounded-lg border border-outline-variant/15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+                >
+                  Anterior
+                </button>
+                <span className="text-sm text-on-surface/60 px-4">
+                  {pagina + 1} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPagina((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={pagina >= totalPages - 1}
+                  className="px-4 py-2 rounded-lg border border-outline-variant/15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+                >
+                  Próxima
+                </button>
+              </div>
+            )}
           </div>
         )}
       </main>

@@ -12,6 +12,31 @@ const statusConfig = {
   LIDO: { label: "Lido", className: "bg-surface-container-low text-on-surface/70" },
 };
 
+function Estrelas({ avaliacao }: { avaliacao?: number }) {
+  if (avaliacao === undefined || avaliacao === null) return null;
+  return (
+    <div className="flex gap-0.5" aria-label={`${avaliacao} de 5 estrelas`}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <svg
+          key={star}
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill={star <= avaliacao ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={star <= avaliacao ? "text-yellow-500" : "text-on-surface/20"}
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
 export default function LivroCard({
   livro,
   onEditar,
@@ -27,7 +52,10 @@ export default function LivroCard({
         >
           {status.label}
         </span>
-        <span className="text-xs font-medium text-on-surface/40">{livro.ano}</span>
+        <div className="flex items-center gap-2">
+          {livro.status === "LIDO" && <Estrelas avaliacao={livro.avaliacao} />}
+          <span className="text-xs font-medium text-on-surface/40">{livro.ano}</span>
+        </div>
       </div>
 
       <div>

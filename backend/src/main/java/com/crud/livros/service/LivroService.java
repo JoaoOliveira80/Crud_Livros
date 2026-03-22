@@ -3,6 +3,8 @@ package com.crud.livros.service;
 import com.crud.livros.exception.LivroNotFoundException;
 import com.crud.livros.model.Livro;
 import com.crud.livros.repository.LivroRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,10 @@ public class LivroService {
 
     public List<Livro> listarTodos() {
         return repository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public Page<Livro> listarPaginado(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     public Livro buscarPorId(Long id) {
@@ -37,10 +43,15 @@ public class LivroService {
         livro.setAno(dados.getAno());
         livro.setDescricao(dados.getDescricao());
         livro.setStatus(dados.getStatus());
+        livro.setAvaliacao(dados.getAvaliacao());
         return repository.save(livro);
     }
 
     public void deletar(Long id) {
         repository.delete(buscarPorId(id));
+    }
+
+    public List<Livro> importar(List<Livro> livros) {
+        return repository.saveAll(livros);
     }
 }

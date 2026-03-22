@@ -63,7 +63,7 @@ export default function Biblioteca() {
   };
 
   const prepararDelecao = (id: number) => {
-    const livro = livros.find(l => l.id === id);
+    const livro = livros.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
   };
 
@@ -85,8 +85,8 @@ export default function Biblioteca() {
   };
 
   const livrosFiltrados = livros.filter((l) => {
-    const matchesBusca = 
-      l.titulo.toLowerCase().includes(busca.toLowerCase()) || 
+    const matchesBusca =
+      l.titulo.toLowerCase().includes(busca.toLowerCase()) ||
       l.autor.toLowerCase().includes(busca.toLowerCase());
     const matchesStatus = statusFiltro === "" || l.status === statusFiltro;
     const matchesGenero = generoFiltro === "" || l.genero === generoFiltro;
@@ -103,20 +103,23 @@ export default function Biblioteca() {
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div>
             <h1 className="text-5xl font-serif text-primary">Biblioteca</h1>
-            <p className="text-on-surface/60 mt-3 text-lg italic">Catalogação completa da sua jornada literária.</p>
+            <p className="text-on-surface/60 mt-3 text-lg italic">
+              Catalogação completa da sua jornada literária.
+            </p>
           </div>
-          
+
           <div className="flex flex-wrap gap-4">
             <input
               type="text"
               placeholder="Pesquisar..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary/30 min-w-[200px]"
+              className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary/30 min-w-50"
             />
             <select
               value={statusFiltro}
               onChange={(e) => setStatusFiltro(e.target.value)}
+              aria-label="Filtrar por status"
               className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
               <option value="">Todos os Status</option>
@@ -127,18 +130,23 @@ export default function Biblioteca() {
             <select
               value={generoFiltro}
               onChange={(e) => setGeneroFiltro(e.target.value)}
+              aria-label="Filtrar por gênero"
               className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
               <option value="">Todos os Gêneros</option>
-              {generos.map(g => (
-                <option key={g} value={g}>{g}</option>
+              {generos.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
               ))}
             </select>
           </div>
         </header>
 
         {loading ? (
-          <div className="py-20 text-center font-serif italic text-xl text-on-surface/40">Sincronizando biblioteca...</div>
+          <div className="py-20 text-center font-serif italic text-xl text-on-surface/40">
+            Sincronizando biblioteca...
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {livrosFiltrados.map((l) => (
@@ -170,12 +178,18 @@ export default function Biblioteca() {
         <div className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
             <div className="flex flex-col gap-2 text-center">
-              <h3 className="text-2xl font-serif text-primary">Remover Volume?</h3>
+              <h3 className="text-2xl font-serif text-primary">
+                Remover Volume?
+              </h3>
               <p className="text-on-surface/60 text-sm leading-relaxed">
-                Você está prestes a remover <span className="font-bold text-primary italic">"{livroDeletando.titulo}"</span> da sua estante.
+                Você está prestes a remover{" "}
+                <span className="font-bold text-primary italic">
+                  &quot;{livroDeletando.titulo}&quot;
+                </span>{" "}
+                da sua estante.
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-3">
               <button
                 onClick={confirmarDelecao}
@@ -197,7 +211,12 @@ export default function Biblioteca() {
       {aviso && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
           <span className="text-sm font-medium">{aviso}</span>
-          <button onClick={() => setAviso("")} className="text-white/60 hover:text-white">✕</button>
+          <button
+            onClick={() => setAviso("")}
+            className="text-white/60 hover:text-white"
+          >
+            ✕
+          </button>
         </div>
       )}
     </>

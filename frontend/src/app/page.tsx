@@ -67,7 +67,7 @@ export default function Home() {
   };
 
   const prepararDelecao = (id: number) => {
-    const livro = livros.find(l => l.id === id);
+    const livro = livros.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
   };
 
@@ -84,8 +84,8 @@ export default function Home() {
   };
 
   const livrosFiltrados = livros.filter((l) => {
-    const matchesBusca = 
-      l.titulo.toLowerCase().includes(busca.toLowerCase()) || 
+    const matchesBusca =
+      l.titulo.toLowerCase().includes(busca.toLowerCase()) ||
       l.autor.toLowerCase().includes(busca.toLowerCase());
     const matchesGenero = generoFiltro === "" || l.genero === generoFiltro;
     return matchesBusca && matchesGenero;
@@ -110,12 +110,10 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface/30">
             <span className="text-7xl font-serif italic">The empty shelf.</span>
             <p className="max-w-md text-center font-medium leading-relaxed">
-              Explore sua coleção pessoal e acompanhe sua jornada literária. Cada livro é uma janela para um novo mundo.
+              Explore sua coleção pessoal e acompanhe sua jornada literária.
+              Cada livro é uma janela para um novo mundo.
             </p>
-            <button
-              onClick={abrirNovo}
-              className="btn-primary mt-4"
-            >
+            <button onClick={abrirNovo} className="btn-primary mt-4">
               Adicionar o primeiro volume
             </button>
           </div>
@@ -123,16 +121,19 @@ export default function Home() {
           <div className="flex flex-col gap-24">
             <header className="max-w-3xl">
               <h2 className="text-[3.5rem] font-serif leading-[1.1] text-primary tracking-tight">
-                Boa leitura,<br/>
+                Boa leitura,
+                <br />
                 <span className="italic">A curadoria é uma arte.</span>
               </h2>
               <p className="text-on-surface/60 mt-6 leading-relaxed text-lg">
-                Explore sua coleção pessoal e acompanhe sua jornada literária. 
-                Sua estante agora conta com <span className="text-primary font-bold">{livros.length}</span> volumes catalogados.
+                Explore sua coleção pessoal e acompanhe sua jornada literária.
+                Sua estante agora conta com{" "}
+                <span className="text-primary font-bold">{livros.length}</span>{" "}
+                volumes catalogados.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <div className="flex-1 min-w-[280px]">
+                <div className="flex-1 min-w-70">
                   <input
                     type="text"
                     placeholder="Buscar por título ou autor..."
@@ -144,17 +145,23 @@ export default function Home() {
                 <select
                   value={generoFiltro}
                   onChange={(e) => setGeneroFiltro(e.target.value)}
+                  aria-label="Filtrar por gênero"
                   className="bg-surface-container-low border border-outline-variant/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary/30 transition-colors cursor-pointer"
                 >
                   <option value="">Todos os Gêneros</option>
-                  {generos.map(g => (
-                    <option key={g} value={g}>{g}</option>
+                  {generos.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </select>
 
                 {(busca !== "" || generoFiltro !== "") && (
                   <button
-                    onClick={() => { setBusca(""); setGeneroFiltro(""); }}
+                    onClick={() => {
+                      setBusca("");
+                      setGeneroFiltro("");
+                    }}
                     className="text-xs font-bold uppercase tracking-widest text-primary hover:underline px-2"
                   >
                     Limpar Filtros
@@ -167,7 +174,9 @@ export default function Home() {
               {lendo.length > 0 && (
                 <section>
                   <div className="flex items-baseline justify-between mb-8">
-                    <h3 className="text-2xl font-serif text-primary">Atualmente Lendo</h3>
+                    <h3 className="text-2xl font-serif text-primary">
+                      Atualmente Lendo
+                    </h3>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
                       {lendo.length} ATIVOS
                     </span>
@@ -190,7 +199,9 @@ export default function Home() {
                   {queroLer.length > 0 && (
                     <section>
                       <div className="flex items-baseline justify-between mb-8">
-                        <h3 className="text-2xl font-serif text-primary">Próximos da Lista</h3>
+                        <h3 className="text-2xl font-serif text-primary">
+                          Próximos da Lista
+                        </h3>
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/30">
                           {queroLer.length} DESEJOS
                         </span>
@@ -210,28 +221,40 @@ export default function Home() {
                 </div>
 
                 <aside className="lg:col-span-4 bg-surface-container-low p-8 rounded-2xl h-fit sticky top-28">
-                  <h3 className="text-xl font-serif text-primary mb-6">Ações Rápidas</h3>
+                  <h3 className="text-xl font-serif text-primary mb-6">
+                    Ações Rápidas
+                  </h3>
                   <div className="flex flex-col gap-3">
-                    <button onClick={abrirNovo} className="btn-primary w-full text-sm">
+                    <button
+                      onClick={abrirNovo}
+                      className="btn-primary w-full text-sm"
+                    >
                       + Novo Volume
                     </button>
-                    <button onClick={() => mostrarAviso("Funcionalidade em desenvolvimento")} className="btn-secondary w-full text-sm">
+                    <button
+                      onClick={() =>
+                        mostrarAviso("Funcionalidade em desenvolvimento")
+                      }
+                      className="btn-secondary w-full text-sm"
+                    >
                       Ver Biblioteca
                     </button>
                   </div>
-                  
+
                   {lidos.length > 0 && (
                     <div className="mt-12">
-                      <h4 className="text-xs font-bold uppercase tracking-[0.1em] text-on-surface/30 mb-4">
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface/30 mb-4">
                         Recentemente Concluídos
                       </h4>
                       <div className="flex flex-col gap-6">
-                        {lidos.slice(0, 3).map(l => (
+                        {lidos.slice(0, 3).map((l) => (
                           <div key={l.id} className="group cursor-pointer">
                             <p className="text-sm font-serif text-primary truncate group-hover:text-primary-container transition-colors">
                               {l.titulo}
                             </p>
-                            <p className="text-[10px] text-on-surface/40 uppercase mt-0.5">{l.autor}</p>
+                            <p className="text-[10px] text-on-surface/40 uppercase mt-0.5">
+                              {l.autor}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -243,8 +266,12 @@ export default function Home() {
               {lidos.length > 3 && (
                 <section>
                   <div className="flex items-baseline justify-between mb-8">
-                    <h3 className="text-2xl font-serif text-primary">Histórico de Leitura</h3>
-                    <button className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">Ver Todos</button>
+                    <h3 className="text-2xl font-serif text-primary">
+                      Histórico de Leitura
+                    </h3>
+                    <button className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">
+                      Ver Todos
+                    </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {lidos.slice(3).map((l) => (
@@ -275,12 +302,18 @@ export default function Home() {
         <div className="fixed inset-0 bg-on-surface/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
             <div className="flex flex-col gap-2 text-center">
-              <h3 className="text-2xl font-serif text-primary">Remover Volume?</h3>
+              <h3 className="text-2xl font-serif text-primary">
+                Remover Volume?
+              </h3>
               <p className="text-on-surface/60 text-sm leading-relaxed">
-                Você está prestes a remover <span className="font-bold text-primary italic">"{livroDeletando.titulo}"</span> da sua estante. Esta ação não pode ser desfeita.
+                Você está prestes a remover{" "}
+                <span className="font-bold text-primary italic">
+                  &quot;{livroDeletando.titulo}&quot;
+                </span>{" "}
+                da sua estante. Esta ação não pode ser desfeita.
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-3">
               <button
                 onClick={confirmarDelecao}
@@ -301,7 +334,12 @@ export default function Home() {
       {aviso && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
           <span className="text-sm font-medium">{aviso}</span>
-          <button onClick={() => setAviso("")} className="text-white/60 hover:text-white">✕</button>
+          <button
+            onClick={() => setAviso("")}
+            className="text-white/60 hover:text-white"
+          >
+            ✕
+          </button>
         </div>
       )}
     </>

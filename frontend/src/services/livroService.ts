@@ -13,7 +13,10 @@ export const livroService = {
     page: number,
     size: number = 12,
     sortBy: string = "createdAt",
-    sortDir: "asc" | "desc" = "desc"
+    sortDir: "asc" | "desc" = "desc",
+    busca?: string,
+    genero?: string,
+    status?: string
   ): Promise<PageResponse<Livro>> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -21,6 +24,9 @@ export const livroService = {
       sortBy,
       sortDir,
     });
+    if (busca) params.set("busca", busca);
+    if (genero) params.set("genero", genero);
+    if (status) params.set("status", status);
     const res = await fetch(`${BASE_URL}/paginado?${params}`, { cache: "no-store" });
     if (!res.ok) throw new Error("Erro ao buscar livros");
     return res.json();
@@ -64,11 +70,15 @@ export const livroService = {
   },
 
   async importar(livros: Partial<LivroForm>[]): Promise<Livro[]> {
-    const criados: Livro[] = [];
-    for (const livro of livros) {
-      const criado = await this.criar(livro as LivroForm);
-      criados.push(criado);
+    const res = await fetch(`${BASE_URL}/importar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(livros),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.erro || "Erro ao importar livros");
     }
-    return criados;
+    return res.json();
   },
 };

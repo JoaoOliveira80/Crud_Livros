@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Livro, LivroForm, Status } from "../types/livros";
 
 interface LivroModalProps {
@@ -19,6 +19,23 @@ const formInicial: LivroForm = {
   avaliacao: undefined,
 };
 
+function validateField(name: string, value: unknown): string {
+  switch (name) {
+    case "titulo":
+      return !String(value).trim() ? "Título é obrigatório" : "";
+    case "autor":
+      return !String(value).trim() ? "Autor é obrigatório" : "";
+    case "genero":
+      return !String(value).trim() ? "Gênero é obrigatório" : "";
+    case "ano":
+      if (value === "" || value === undefined) return "Ano é obrigatório";
+      if (Number(value) < 1000 || Number(value) > 2030) return "Ano deve ser entre 1000 e 2030";
+      return "";
+    default:
+      return "";
+  }
+}
+
 export default function LivroModal({
   livro,
   onSalvar,
@@ -27,6 +44,8 @@ export default function LivroModal({
   const [form, setForm] = useState<LivroForm>(formInicial);
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (livro) {
@@ -43,7 +62,15 @@ export default function LivroModal({
       setForm(formInicial);
     }
     setErro("");
+    setTouched({});
+    setFieldErrors({});
   }, [livro]);
+
+  const handleBlur = useCallback((name: string) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, form[name as keyof LivroForm]);
+    setFieldErrors((prev) => ({ ...prev, [name]: error }));
+  }, [form]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -52,7 +79,11 @@ export default function LivroModal({
   ) => {
     const { name, value } = e.target;
     if (name === "ano") {
-      setForm((prev) => ({ ...prev, [name]: value === "" ? "" : Number(value) }));
+      const numValue = value === "" ? "" : Number(value);
+      setForm((prev) => ({ ...prev, [name]: numValue }));
+      if (touched[name]) {
+        setFieldErrors((prev) => ({ ...prev, [name]: validateField(name, numValue) }));
+      }
     } else if (name === "status") {
       setForm((prev) => ({
         ...prev,
@@ -61,7 +92,11 @@ export default function LivroModal({
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
+      if (touched[name]) {
+        setFieldErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+      }
     }
+    setErro("");
   };
 
   const handleAvaliacao = (value: number) => {
@@ -69,16 +104,23 @@ export default function LivroModal({
   };
 
   const handleSubmit = async () => {
-    if (
-      !form.titulo.trim() ||
-      !form.autor.trim() ||
-      !form.genero.trim() ||
-      !form.ano
-    ) {
+    const errors: Record<string, string> = {};
+    const allTouched: Record<string, boolean> = {};
+    for (const field of ["titulo", "autor", "genero", "ano"]) {
+      allTouched[field] = true;
+      errors[field] = validateField(field, form[field as keyof LivroForm]);
+    }
+    setTouched(allTouched);
+    setFieldErrors(errors);
+
+    const hasErrors = Object.values(errors).some(Boolean);
+    if (hasErrors) {
       setErro("Preencha todos os campos obrigatórios.");
       return;
     }
+
     setSalvando(true);
+    setErro("");
     try {
       await onSalvar(form);
     } catch (err) {
@@ -90,8 +132,14 @@ export default function LivroModal({
     }
   };
 
-  const inputClass =
-    "w-full bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-30 focus:outline-none focus:border-primary-30 transition-colors font-sans";
+  const getInputClass = (name: string) => {
+    const base =
+      "w-full bg-surface-container-low border rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-30 focus:outline-none transition-colors font-sans";
+    if (touched[name] && fieldErrors[name]) {
+      return `${base} border-error focus:border-error`;
+    }
+    return `${base} border-outline-variant-15 focus:border-primary-30`;
+  };
 
   return (
     <div
@@ -99,7 +147,7 @@ export default function LivroModal({
       onClick={onFechar}
     >
       <div
-        className="bg-surface border-none shadow-ambient rounded-2xl w-full max-w-lg p-8 flex flex-col gap-8 transform transition-all"
+        className="bg-surface border-none shadow-ambient rounded-2xl w-full max-w-lg p-8 flex flex-col gap-8 transform transition-all max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -120,7 +168,7 @@ export default function LivroModal({
         </div>
 
         {erro && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-lg">
+          <p className="text-sm text-error bg-error-container border border-error-container px-4 py-3 rounded-lg">
             {erro}
           </p>
         )}
@@ -134,9 +182,13 @@ export default function LivroModal({
               name="titulo"
               value={form.titulo}
               onChange={handleChange}
+              onBlur={() => handleBlur("titulo")}
               placeholder="Ex: Dom Casmurro"
-              className={inputClass}
+              className={getInputClass("titulo")}
             />
+            {touched.titulo && fieldErrors.titulo && (
+              <span className="text-xs text-error ml-1">{fieldErrors.titulo}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -147,9 +199,13 @@ export default function LivroModal({
               name="autor"
               value={form.autor}
               onChange={handleChange}
+              onBlur={() => handleBlur("autor")}
               placeholder="Ex: Machado de Assis"
-              className={inputClass}
+              className={getInputClass("autor")}
             />
+            {touched.autor && fieldErrors.autor && (
+              <span className="text-xs text-error ml-1">{fieldErrors.autor}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -160,9 +216,13 @@ export default function LivroModal({
               name="genero"
               value={form.genero}
               onChange={handleChange}
+              onBlur={() => handleBlur("genero")}
               placeholder="Ex: Realismo"
-              className={inputClass}
+              className={getInputClass("genero")}
             />
+            {touched.genero && fieldErrors.genero && (
+              <span className="text-xs text-error ml-1">{fieldErrors.genero}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -174,9 +234,13 @@ export default function LivroModal({
               type="number"
               value={form.ano}
               onChange={handleChange}
+              onBlur={() => handleBlur("ano")}
               placeholder="Ex: 1899"
-              className={inputClass}
+              className={getInputClass("ano")}
             />
+            {touched.ano && fieldErrors.ano && (
+              <span className="text-xs text-error ml-1">{fieldErrors.ano}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -191,7 +255,7 @@ export default function LivroModal({
               name="status"
               value={form.status}
               onChange={handleChange}
-              className={`${inputClass} appearance-none cursor-pointer`}
+              className={`${getInputClass("status")} appearance-none cursor-pointer`}
             >
               <option value="QUERO_LER">Quero Ler</option>
               <option value="LENDO">Lendo</option>
@@ -218,8 +282,8 @@ export default function LivroModal({
                       width="32"
                       height="32"
                       viewBox="0 0 24 24"
-                      fill={star <= (form.avaliacao || 0) ? "#eab308" : "none"}
-                      stroke={star <= (form.avaliacao || 0) ? "#eab308" : "currentColor"}
+                      fill="currentColor"
+                      stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -233,7 +297,7 @@ export default function LivroModal({
                   <button
                     type="button"
                     onClick={() => handleAvaliacao(0)}
-                    className="text-xs text-on-surface-50 hover:text-red-500 ml-2"
+                    className="text-xs text-on-surface-50 hover:text-error ml-2"
                   >
                     Limpar
                   </button>
@@ -252,7 +316,7 @@ export default function LivroModal({
               onChange={handleChange}
               placeholder="Impressões sobre o livro..."
               rows={3}
-              className={`${inputClass} resize-none`}
+              className={`${getInputClass("descricao")} resize-none`}
             />
           </div>
         </div>

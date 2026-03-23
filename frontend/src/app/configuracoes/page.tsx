@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react";
 import { Livro } from "@/types/livros";
 import { livroService } from "@/services/livroService";
+import { useToast } from "@/hooks/useToast";
 import Header from "@/components/Header";
+import Toast from "@/components/Toast";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Configuracoes() {
   const [livros, setLivros] = useState<Livro[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [aviso, setAviso] = useState("");
   const { theme, toggleTheme } = useTheme();
+  const { aviso, mostrarAviso, fecharAviso } = useToast();
 
   useEffect(() => {
     async function carregar() {
@@ -19,8 +20,6 @@ export default function Configuracoes() {
         setLivros(data);
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     }
     carregar();
@@ -31,11 +30,6 @@ export default function Configuracoes() {
     lidos: livros.filter(l => l.status === "LIDO").length,
     lendo: livros.filter(l => l.status === "LENDO").length,
     queroLer: livros.filter(l => l.status === "QUERO_LER").length,
-  };
-
-  const mostrarAviso = (msg: string) => {
-    setAviso(msg);
-    setTimeout(() => setAviso(""), 3000);
   };
 
   return (
@@ -59,7 +53,7 @@ export default function Configuracoes() {
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">Bio</label>
                 <p className="text-sm text-on-surface-70 mt-1 leading-relaxed italic">
-                  "Sempre carregando um livro, as vezes dois. Apaixonado por ficção científica e clássicos do realismo."
+                  &ldquo;Sempre carregando um livro, as vezes dois. Apaixonado por ficção científica e clássicos do realismo.&rdquo;
                 </p>
               </div>
               <button onClick={() => mostrarAviso("Configurações de perfil salvas (mock)")} className="btn-secondary w-fit text-xs px-4 py-2 mt-2">
@@ -71,19 +65,19 @@ export default function Configuracoes() {
           <section className="bg-surface-container-low p-8 rounded-2xl shadow-sm border border-outline-variant-10">
             <h2 className="text-2xl font-serif text-primary mb-6">Métricas da Estante</h2>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-xl border border-outline-variant/5">
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">Total</span>
                 <p className="text-3xl font-serif text-primary mt-1">{stats.total}</p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-outline-variant/5">
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">Lidos</span>
                 <p className="text-3xl font-serif text-secondary mt-1">{stats.lidos}</p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-outline-variant/5">
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">Lendo</span>
                 <p className="text-3xl font-serif text-primary-container mt-1">{stats.lendo}</p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-outline-variant/5">
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/5">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">Desejos</span>
                 <p className="text-3xl font-serif text-on-surface-60 mt-1">{stats.queroLer}</p>
               </div>
@@ -116,12 +110,7 @@ export default function Configuracoes() {
         </div>
       </main>
 
-      {aviso && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
-          <span className="text-sm font-medium">{aviso}</span>
-          <button onClick={() => setAviso("")} className="text-white-60 hover:text-white">✕</button>
-        </div>
-      )}
+      <Toast aviso={aviso} onFechar={fecharAviso} />
     </>
   );
 }

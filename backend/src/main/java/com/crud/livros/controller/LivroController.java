@@ -34,12 +34,19 @@ public class LivroController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String busca,
+            @RequestParam(required = false) String genero,
+            @RequestParam(required = false) String status) {
         Sort sort = sortDir.equalsIgnoreCase("asc") 
             ? Sort.by(sortBy).ascending() 
             : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(service.listarPaginado(pageable));
+        Livro.Status statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            statusEnum = Livro.Status.valueOf(status);
+        }
+        return ResponseEntity.ok(service.listarPaginado(busca, genero, statusEnum, pageable));
     }
 
     @GetMapping("/{id}")

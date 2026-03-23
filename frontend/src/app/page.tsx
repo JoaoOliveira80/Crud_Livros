@@ -3,9 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Livro, LivroForm, PageResponse } from "@/types/livros";
 import { livroService } from "@/services/livroService";
+import { useToast } from "@/hooks/useToast";
 import Header from "@/components/Header";
 import LivroCard from "@/components/LivroCard";
 import LivroModal from "@/components/LivroModal";
+import Toast from "@/components/Toast";
+import ConfirmModal from "@/components/ConfirmModal";
+import SkeletonCards from "@/components/SkeletonCards";
 
 const PAGE_SIZE = 12;
 
@@ -18,9 +22,9 @@ export default function Home() {
   const [livroDeletando, setLivroDeletando] = useState<Livro | null>(null);
   const [busca, setBusca] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState("");
-  const [aviso, setAviso] = useState("");
   const [importando, setImportando] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { aviso, mostrarAviso, fecharAviso } = useToast();
 
   const carregarLivros = useCallback(async () => {
     try {
@@ -79,11 +83,6 @@ export default function Home() {
     fecharModal();
   };
 
-  const mostrarAviso = (msg: string) => {
-    setAviso(msg);
-    setTimeout(() => setAviso(""), 3000);
-  };
-
   const prepararDelecao = (id: number) => {
     const livro = pageData?.content.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
@@ -95,17 +94,16 @@ export default function Home() {
       await livroService.deletar(livroDeletando.id);
       setPageData((prev) => {
         if (!prev) return prev;
-        const filtered = prev.content.filter((l) => l.id !== livroDeletando.id);
         return {
           ...prev,
-          content: filtered,
+          content: prev.content.filter((l) => l.id !== livroDeletando.id),
           totalElements: prev.totalElements - 1,
         };
       });
       setLivroDeletando(null);
     } catch (err) {
       console.error("Erro ao deletar:", err);
-      alert("Erro ao deletar o livro. Tente novamente.");
+      mostrarAviso("Erro ao deletar o livro. Tente novamente.");
     }
   };
 
@@ -153,7 +151,7 @@ export default function Home() {
       mostrarAviso(`${criados.length} livros importados com sucesso!`);
     } catch (err) {
       console.error("Erro ao importar:", err);
-      alert("Erro ao importar arquivo. Verifique o formato.");
+      mostrarAviso("Erro ao importar arquivo. Verifique o formato.");
     } finally {
       setImportando(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -175,9 +173,7 @@ export default function Home() {
 
       <main className="max-w-5xl mx-auto px-6 py-16">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-on-surface-40 font-serif italic text-xl">
-            Preparando curadoria...
-          </div>
+          <SkeletonCards count={6} />
         ) : livro.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface-30">
             <span className="text-7xl font-serif italic">The empty shelf.</span>
@@ -185,9 +181,18 @@ export default function Home() {
               Explore sua coleção pessoal e acompanhe sua jornada literária.
               Cada livro é uma janela para um novo mundo.
             </p>
-            <button onClick={abrirNovo} className="btn-primary mt-4">
-              Adicionar o primeiro volume
-            </button>
+            <div className="flex items-center gap-4 mt-4">
+              <button onClick={abrirNovo} className="btn-primary">
+                Adicionar o primeiro volume
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importando}
+                className="btn-secondary disabled:opacity-50"
+              >
+                {importando ? "Importando..." : "Importar Biblioteca"}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-24">
@@ -316,13 +321,6 @@ export default function Home() {
                     >
                       {importando ? "Importando..." : "↑ Importar Biblioteca"}
                     </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".json"
-                      onChange={importarJSON}
-                      className="hidden"
-                    />
                   </div>
 
                   {lidos.length > 0 && (
@@ -405,49 +403,33 @@ export default function Home() {
       )}
 
       {livroDeletando && (
-        <div className="fixed inset-0 bg-on-surface-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
-            <div className="flex flex-col gap-2 text-center">
-              <h3 className="text-2xl font-serif text-primary">
-                Remover Volume?
-              </h3>
-              <p className="text-on-surface-60 text-sm leading-relaxed">
-                Você está prestes a remover{" "}
-                <span className="font-bold text-primary italic">
-                  &quot;{livroDeletando.titulo}&quot;
-                </span>{" "}
-                da sua estante. Esta ação não pode ser desfeita.
-              </p>
-            </div>
+        <ConfirmModal
+          titulo="Remover Volume?"
+          mensagem={
+            <>
+              Você está prestes a remover{" "}
+              <span className="font-bold text-primary italic">
+                &quot;{livroDeletando.titulo}&quot;
+              </span>{" "}
+              da sua estante. Esta ação não pode ser desfeita.
+            </>
+          }
+          textoConfirmar="Confirmar Remoção"
+          textoCancelar="Manter na Coleção"
+          onConfirmar={confirmarDelecao}
+          onCancelar={() => setLivroDeletando(null)}
+        />
+      )}
 
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={confirmarDelecao}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition-colors text-sm"
-              >
-                Confirmar Remoção
-              </button>
-              <button
-                onClick={() => setLivroDeletando(null)}
-                className="btn-secondary w-full text-sm"
-              >
-                Manter na Coleção
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {aviso && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
-          <span className="text-sm font-medium">{aviso}</span>
-          <button
-            onClick={() => setAviso("")}
-            className="text-white-60 hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={importarJSON}
+        className="hidden"
+      />
+
+      <Toast aviso={aviso} onFechar={fecharAviso} />
     </>
   );
 }

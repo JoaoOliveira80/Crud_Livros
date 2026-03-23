@@ -45,29 +45,35 @@
   --status-lido: #eac2b5;
   --status-lido-text: #5c3a2a;
   
+  /* Error */
+  --error: #d32f2f;
+  --error-container: #fdecea;
+  --on-error: #ffffff;
+  --on-error-container: #5c1616;
+  
   --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
 }
 
 [data-theme="dark"] {
   /* Modo Escuro - Athenaeum Obsidian */
-  --surface: #121212;
-  --surface-container-low: #1e1e1e;
-  --surface-container-lowest: #2a2a2a;
-  --surface-container-high: #333333;
+  --surface: #141418;
+  --surface-container-lowest: #1c1c22;
+  --surface-container-low: #222230;
+  --surface-container-high: #2e2e3c;
   
-  --primary: #7ea8b8;
-  --primary-container: #1e3a47;
-  --on-primary: #121212;
+  --primary: #88b5c8;
+  --primary-container: #2a4b5d;
+  --on-primary: #0d1b21;
   --on-primary-container: #c5e4ed;
   
   --secondary: #8fb896;
   --secondary-container: #1e4620;
-  --on-secondary: #121212;
+  --on-secondary: #0d1b21;
   --on-secondary-container: #b4dcc0;
   
-  --on-surface: #e8e8e6;
-  --on-surface-variant: #a8a8a0;
-  --outline-variant: #44483d;
+  --on-surface: #e4e2dc;
+  --on-surface-variant: #a0a09a;
+  --outline-variant: #4a4a48;
   
   /* Status Colors - Modo Escuro */
   --status-quero-ler: #1a3a5c;
@@ -77,7 +83,13 @@
   --status-lido: #5c3a2a;
   --status-lido-text: #ffcbb3;
   
-  --shadow-ambient: 0 8px 40px rgba(0, 0, 0, 0.4);
+  /* Error */
+  --error: #ef5350;
+  --error-container: #5c2020;
+  --on-error: #ffffff;
+  --on-error-container: #ffcdd2;
+  
+  --shadow-ambient: 0 8px 40px rgba(10, 10, 18, 0.5);
 }
 
 @layer base {
@@ -190,6 +202,13 @@
   
   .border-primary { border-color: var(--primary); }
   .border-primary-30 { border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
+  
+  .text-error { color: var(--error); }
+  .bg-error { background-color: var(--error); }
+  .bg-error-container { background-color: var(--error-container); }
+  .border-error-container { border-color: var(--error-container); }
+  .text-on-error { color: var(--on-error); }
+  .text-error-container { color: var(--error-container); }
   
   .hover\:bg-surface-container-low:hover { background-color: var(--surface-container-low); }
   

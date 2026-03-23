@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LivroService {
@@ -22,8 +23,13 @@ public class LivroService {
         return repository.findAllByOrderByCreatedAtDesc();
     }
 
-    public Page<Livro> listarPaginado(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<Livro> listarPaginado(String busca, String genero, Livro.Status status, Pageable pageable) {
+        return repository.buscarComFiltros(
+                busca != null && busca.isBlank() ? null : busca,
+                genero != null && genero.isBlank() ? null : genero,
+                status,
+                pageable
+        );
     }
 
     public Livro buscarPorId(Long id) {
@@ -52,6 +58,9 @@ public class LivroService {
     }
 
     public List<Livro> importar(List<Livro> livros) {
-        return repository.saveAll(livros);
+        List<Livro> novos = livros.stream()
+                .filter(l -> !repository.existsByTituloAndAutor(l.getTitulo(), l.getAutor()))
+                .collect(Collectors.toList());
+        return repository.saveAll(novos);
     }
 }

@@ -1,38 +1,67 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Livro, LivroForm } from "@/types/livros";
+import { Livro, LivroForm, PageResponse } from "@/types/livros";
 import { livroService } from "@/services/livroService";
+import { useToast } from "@/hooks/useToast";
 import Header from "@/components/Header";
 import LivroCard from "@/components/LivroCard";
 import LivroModal from "@/components/LivroModal";
+import Toast from "@/components/Toast";
+import ConfirmModal from "@/components/ConfirmModal";
+import SkeletonCards from "@/components/SkeletonCards";
+
+const PAGE_SIZE = 12;
 
 export default function Biblioteca() {
-  const [livros, setLivros] = useState<Livro[]>([]);
+  const [pageData, setPageData] = useState<PageResponse<Livro> | null>(null);
+  const [pagina, setPagina] = useState(0);
   const [loading, setLoading] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [livroEditando, setLivroEditando] = useState<Livro | null>(null);
   const [livroDeletando, setLivroDeletando] = useState<Livro | null>(null);
   const [busca, setBusca] = useState("");
+  const [buscaAtual, setBuscaAtual] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState("");
-  const [aviso, setAviso] = useState("");
+  const { aviso, mostrarAviso, fecharAviso } = useToast();
 
   const carregarLivros = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await livroService.listarTodos();
-      setLivros(data);
+      const data = await livroService.listarPaginado(
+        pagina,
+        PAGE_SIZE,
+        "createdAt",
+        "desc",
+        buscaAtual || undefined,
+        generoFiltro || undefined,
+        statusFiltro || undefined
+      );
+      setPageData(data);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pagina, buscaAtual, statusFiltro, generoFiltro]);
 
   useEffect(() => {
     carregarLivros();
   }, [carregarLivros]);
+
+  const aplicarBusca = () => {
+    setPagina(0);
+    setBuscaAtual(busca);
+  };
+
+  const limparFiltros = () => {
+    setBusca("");
+    setBuscaAtual("");
+    setStatusFiltro("");
+    setGeneroFiltro("");
+    setPagina(0);
+  };
 
   const abrirNovo = () => {
     setLivroEditando(null);
@@ -52,18 +81,31 @@ export default function Biblioteca() {
   const handleSalvar = async (dados: LivroForm) => {
     if (livroEditando) {
       const atualizado = await livroService.atualizar(livroEditando.id, dados);
-      setLivros((prev) =>
-        prev.map((l) => (l.id === livroEditando.id ? atualizado : l)),
-      );
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: prev.content.map((l) =>
+            l.id === livroEditando.id ? atualizado : l
+          ),
+        };
+      });
     } else {
       const criado = await livroService.criar(dados);
-      setLivros((prev) => [criado, ...prev]);
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: [criado, ...prev.content],
+          totalElements: prev.totalElements + 1,
+        };
+      });
     }
     fecharModal();
   };
 
   const prepararDelecao = (id: number) => {
-    const livro = livros.find((l) => l.id === id);
+    const livro = pageData?.content.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
   };
 
@@ -71,29 +113,25 @@ export default function Biblioteca() {
     if (!livroDeletando) return;
     try {
       await livroService.deletar(livroDeletando.id);
-      setLivros((prev) => prev.filter((l) => l.id !== livroDeletando.id));
+      setPageData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: prev.content.filter((l) => l.id !== livroDeletando.id),
+          totalElements: prev.totalElements - 1,
+        };
+      });
       setLivroDeletando(null);
     } catch (err) {
       console.error("Erro ao deletar:", err);
-      alert("Erro ao deletar o livro. Tente novamente.");
+      mostrarAviso("Erro ao deletar o livro. Tente novamente.");
     }
   };
 
-  const mostrarAviso = (msg: string) => {
-    setAviso(msg);
-    setTimeout(() => setAviso(""), 3000);
-  };
-
-  const livrosFiltrados = livros.filter((l) => {
-    const matchesBusca =
-      l.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-      l.autor.toLowerCase().includes(busca.toLowerCase());
-    const matchesStatus = statusFiltro === "" || l.status === statusFiltro;
-    const matchesGenero = generoFiltro === "" || l.genero === generoFiltro;
-    return matchesBusca && matchesStatus && matchesGenero;
-  });
-
-  const generos = Array.from(new Set(livros.map((l) => l.genero)));
+  const livros = pageData?.content || [];
+  const totalPages = pageData?.totalPages || 1;
+  const totalElements = pageData?.totalElements || 0;
+  const temFiltro = buscaAtual || statusFiltro || generoFiltro;
 
   return (
     <>
@@ -104,21 +142,33 @@ export default function Biblioteca() {
           <div>
             <h1 className="text-5xl font-serif text-primary">Biblioteca</h1>
             <p className="text-on-surface-60 mt-3 text-lg italic">
-              Catalogação completa da sua jornada literária.
+              {totalElements} volume{totalElements !== 1 ? "s" : ""} catalogado{totalElements !== 1 ? "s" : ""}.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <input
-              type="text"
-              placeholder="Pesquisar..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary-30 min-w-50"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Pesquisar..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && aplicarBusca()}
+                className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary-30 min-w-50"
+              />
+              <button
+                onClick={aplicarBusca}
+                className="btn-primary text-xs px-4 py-2"
+              >
+                Buscar
+              </button>
+            </div>
             <select
               value={statusFiltro}
-              onChange={(e) => setStatusFiltro(e.target.value)}
+              onChange={(e) => {
+                setStatusFiltro(e.target.value);
+                setPagina(0);
+              }}
               aria-label="Filtrar por status"
               className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
@@ -129,27 +179,45 @@ export default function Biblioteca() {
             </select>
             <select
               value={generoFiltro}
-              onChange={(e) => setGeneroFiltro(e.target.value)}
+              onChange={(e) => {
+                setGeneroFiltro(e.target.value);
+                setPagina(0);
+              }}
               aria-label="Filtrar por gênero"
               className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-2 text-sm focus:outline-none cursor-pointer"
             >
               <option value="">Todos os Gêneros</option>
-              {generos.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
+              <option value="Ficção">Ficção</option>
+              <option value="Não-ficção">Não-ficção</option>
+              <option value="Fantasia">Fantasia</option>
+              <option value="Romance">Romance</option>
+              <option value="Terror">Terror</option>
+              <option value="Ficção Científica">Ficção Científica</option>
+              <option value="Biografia">Biografia</option>
+              <option value="História">História</option>
+              <option value="Poesia">Poesia</option>
+              <option value="Outro">Outro</option>
             </select>
+            {temFiltro && (
+              <button
+                onClick={limparFiltros}
+                className="text-xs font-bold uppercase tracking-widest text-primary hover:underline px-2"
+              >
+                Limpar
+              </button>
+            )}
           </div>
         </header>
 
         {loading ? (
-          <div className="py-20 text-center font-serif italic text-xl text-on-surface-40">
-            Sincronizando biblioteca...
+          <SkeletonCards count={8} />
+        ) : livros.length === 0 ? (
+          <div className="py-20 text-center text-on-surface-30 italic">
+            Nenhum volume encontrado{temFiltro ? " com os filtros atuais." : "."}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {livrosFiltrados.map((l) => (
+            {livros.map((l) => (
               <LivroCard
                 key={l.id}
                 livro={l}
@@ -157,11 +225,28 @@ export default function Biblioteca() {
                 onDeletar={prepararDelecao}
               />
             ))}
-            {livrosFiltrados.length === 0 && (
-              <div className="col-span-full py-20 text-center text-on-surface-30 italic">
-                Nenhum volume encontrado com os filtros atuais.
-              </div>
-            )}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-16">
+            <button
+              onClick={() => setPagina((p) => Math.max(0, p - 1))}
+              disabled={pagina === 0}
+              className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+            >
+              Anterior
+            </button>
+            <span className="text-sm text-on-surface-60 px-4">
+              {pagina + 1} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPagina((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={pagina >= totalPages - 1}
+              className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
+            >
+              Próxima
+            </button>
           </div>
         )}
       </main>
@@ -175,50 +260,25 @@ export default function Biblioteca() {
       )}
 
       {livroDeletando && (
-        <div className="fixed inset-0 bg-on-surface-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-8 rounded-2xl shadow-ambient max-w-sm w-full flex flex-col gap-6 transform transition-all animate-in fade-in zoom-in duration-200">
-            <div className="flex flex-col gap-2 text-center">
-              <h3 className="text-2xl font-serif text-primary">
-                Remover Volume?
-              </h3>
-              <p className="text-on-surface-60 text-sm leading-relaxed">
-                Você está prestes a remover{" "}
-                <span className="font-bold text-primary italic">
-                  &quot;{livroDeletando.titulo}&quot;
-                </span>{" "}
-                da sua estante.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={confirmarDelecao}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition-colors text-sm"
-              >
-                Confirmar Remoção
-              </button>
-              <button
-                onClick={() => setLivroDeletando(null)}
-                className="btn-secondary w-full text-sm"
-              >
-                Manter na Coleção
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmModal
+          titulo="Remover Volume?"
+          mensagem={
+            <>
+              Você está prestes a remover{" "}
+              <span className="font-bold text-primary italic">
+                &quot;{livroDeletando.titulo}&quot;
+              </span>{" "}
+              da sua estante.
+            </>
+          }
+          textoConfirmar="Confirmar Remoção"
+          textoCancelar="Manter na Coleção"
+          onConfirmar={confirmarDelecao}
+          onCancelar={() => setLivroDeletando(null)}
+        />
       )}
 
-      {aviso && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
-          <span className="text-sm font-medium">{aviso}</span>
-          <button
-            onClick={() => setAviso("")}
-            className="text-white-60 hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+      <Toast aviso={aviso} onFechar={fecharAviso} />
     </>
   );
 }

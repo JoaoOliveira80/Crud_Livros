@@ -14,6 +14,14 @@
   --color-outline-variant: #c2c7cc;
 
   --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
+  /* Spacing scale */
+  --space-1: 6px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --container-max-width: 1200px;
 }
 
 :root {
@@ -22,21 +30,21 @@
   --surface-container-low: #f5f3ee;
   --surface-container-lowest: #ffffff;
   --surface-container-high: #ffffff;
-  
+
   --primary: #2a4b5d;
   --primary-container: #d4e5ed;
   --on-primary: #ffffff;
   --on-primary-container: #1a3a47;
-  
+
   --secondary: #4a654e;
   --secondary-container: #cde7d0;
   --on-secondary: #ffffff;
   --on-secondary-container: #1e4620;
-  
+
   --on-surface: #1b1c19;
   --on-surface-variant: #45483d;
   --outline-variant: #c2c7cc;
-  
+
   /* Status Colors - Modo Claro */
   --status-quero-ler: #d1e9ff;
   --status-quero-ler-text: #1a3a5c;
@@ -44,13 +52,13 @@
   --status-lendo-text: #1e4620;
   --status-lido: #eac2b5;
   --status-lido-text: #5c3a2a;
-  
+
   /* Error */
   --error: #d32f2f;
   --error-container: #fdecea;
   --on-error: #ffffff;
   --on-error-container: #5c1616;
-  
+
   --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
 }
 
@@ -60,21 +68,21 @@
   --surface-container-lowest: #1c1c22;
   --surface-container-low: #222230;
   --surface-container-high: #2e2e3c;
-  
+
   --primary: #88b5c8;
   --primary-container: #2a4b5d;
   --on-primary: #0d1b21;
   --on-primary-container: #c5e4ed;
-  
+
   --secondary: #8fb896;
   --secondary-container: #1e4620;
   --on-secondary: #0d1b21;
   --on-secondary-container: #b4dcc0;
-  
+
   --on-surface: #e4e2dc;
   --on-surface-variant: #a0a09a;
   --outline-variant: #4a4a48;
-  
+
   /* Status Colors - Modo Escuro */
   --status-quero-ler: #1a3a5c;
   --status-quero-ler-text: #a8d4ff;
@@ -82,13 +90,13 @@
   --status-lendo-text: #b4dcc0;
   --status-lido: #5c3a2a;
   --status-lido-text: #ffcbb3;
-  
+
   /* Error */
   --error: #ef5350;
   --error-container: #5c2020;
   --on-error: #ffffff;
   --on-error-container: #ffcdd2;
-  
+
   --shadow-ambient: 0 8px 40px rgba(10, 10, 18, 0.5);
 }
 
@@ -99,31 +107,82 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+    /* subtle radial paper texture for depth */
+    background-image:
+      radial-gradient(
+        circle at 10% 10%,
+        rgba(0, 0, 0, 0.01) 0px,
+        transparent 40px
+      ),
+      radial-gradient(
+        circle at 90% 90%,
+        rgba(0, 0, 0, 0.01) 0px,
+        transparent 60px
+      );
   }
 
-  h1, h2, h3, h4, .font-serif {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
     font-family: var(--font-serif);
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 3.5vw, 3.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    line-height: 1.08;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .lead {
+    font-size: 1.0625rem;
+    color: color-mix(in srgb, var(--on-surface) 80%, transparent);
   }
 }
 
 @layer components {
   .glass {
-    background-color: color-mix(in srgb, var(--surface-container-low) 80%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--surface-container-low) 80%,
+      transparent
+    );
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
 
   .btn-primary {
-    background: linear-gradient(to bottom right, var(--primary), var(--primary-container));
+    background: linear-gradient(
+      to bottom right,
+      var(--primary),
+      var(--primary-container)
+    );
     color: var(--on-primary);
     padding: 10px 24px;
     border-radius: 8px;
     font-weight: 700;
-    transition: all 0.2s ease;
+    transition: all 0.16s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
   }
 
   .btn-primary:hover {
@@ -142,7 +201,7 @@
     padding: 10px 24px;
     border-radius: 8px;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.16s ease;
     cursor: pointer;
   }
 
@@ -155,84 +214,256 @@
     background-color: var(--surface-container-lowest);
     box-shadow: var(--shadow-ambient);
     border-radius: 8px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .card-ambient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 36px
+      color-mix(in srgb, var(--on-surface) 8%, transparent);
   }
 
-  .card-ambient:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 48px color-mix(in srgb, var(--on-surface) 10%, transparent);
+  .content-area {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-6);
+  }
+
+  .card-padding {
+    padding: var(--space-4);
+  }
+
+  /* skeleton loading */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--surface-container-low) 60%, transparent) 0%,
+      color-mix(in srgb, var(--surface-container-low) 40%, transparent) 50%,
+      color-mix(in srgb, var(--surface-container-low) 60%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Button base to standardize sizes and focus */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    outline-offset: 2px;
+  }
+
+  /* small spinner */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Custom utility classes for opacity */
-  .text-primary { color: var(--primary); }
-  .bg-primary { background-color: var(--primary); }
-  .bg-primary-container { background-color: var(--primary-container); }
-  .text-primary-container { color: var(--primary-container); }
-  
-  .text-on-surface { color: var(--on-surface); }
-  .bg-on-surface { background-color: var(--on-surface); }
-  
-  .text-on-surface-40 { color: color-mix(in srgb, var(--on-surface) 40%, transparent); }
-  .text-on-surface-50 { color: color-mix(in srgb, var(--on-surface) 50%, transparent); }
-  .text-on-surface-60 { color: color-mix(in srgb, var(--on-surface) 60%, transparent); }
-  .text-on-surface-70 { color: color-mix(in srgb, var(--on-surface) 70%, transparent); }
-  .text-on-surface-30 { color: color-mix(in srgb, var(--on-surface) 30%, transparent); }
-  .text-on-surface-20 { color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
-  
-  .bg-surface-container-low { background-color: var(--surface-container-low); }
-  
-  .bg-on-surface-20 { background-color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
-  .bg-surface-container-low\/20 { background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent); }
-  
-  .bg-surface { background-color: var(--surface); }
-  .bg-surface-container-low { background-color: var(--surface-container-low); }
-  .bg-surface-container-lowest { background-color: var(--surface-container-lowest); }
-  .bg-surface-container-high { background-color: var(--surface-container-high); }
-  
-  .bg-surface-container-low-80 { background-color: color-mix(in srgb, var(--surface-container-low) 80%, transparent); }
-  .bg-surface-container-low-40 { background-color: color-mix(in srgb, var(--surface-container-low) 40%, transparent); }
-  .bg-surface-container-low-20 { background-color: color-mix(in srgb, var(--surface-container-low) 20%, transparent); }
-  
-  .bg-on-surface-20 { background-color: color-mix(in srgb, var(--on-surface) 20%, transparent); }
-  
-  .border-outline-variant { border-color: var(--outline-variant); }
-  .border-outline-variant-15 { border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent); }
-  .border-outline-variant-30 { border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent); }
-  .border-outline-variant-10 { border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent); }
-  
-  .border-primary { border-color: var(--primary); }
-  .border-primary-30 { border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
-  
-  .text-error { color: var(--error); }
-  .bg-error { background-color: var(--error); }
-  .bg-error-container { background-color: var(--error-container); }
-  .border-error-container { border-color: var(--error-container); }
-  .text-on-error { color: var(--on-error); }
-  .text-error-container { color: var(--error-container); }
-  
-  .hover\:bg-surface-container-low:hover { background-color: var(--surface-container-low); }
-  
+  .text-primary {
+    color: var(--primary);
+  }
+  .bg-primary {
+    background-color: var(--primary);
+  }
+  .bg-primary-container {
+    background-color: var(--primary-container);
+  }
+  .text-primary-container {
+    color: var(--primary-container);
+  }
+
+  .text-on-surface {
+    color: var(--on-surface);
+  }
+  .bg-on-surface {
+    background-color: var(--on-surface);
+  }
+
+  .text-on-surface-40 {
+    color: color-mix(in srgb, var(--on-surface) 40%, transparent);
+  }
+  .text-on-surface-50 {
+    color: color-mix(in srgb, var(--on-surface) 50%, transparent);
+  }
+  .text-on-surface-60 {
+    color: color-mix(in srgb, var(--on-surface) 60%, transparent);
+  }
+  .text-on-surface-70 {
+    color: color-mix(in srgb, var(--on-surface) 70%, transparent);
+  }
+  .text-on-surface-30 {
+    color: color-mix(in srgb, var(--on-surface) 30%, transparent);
+  }
+  .text-on-surface-20 {
+    color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+  }
+
+  .bg-surface-container-low {
+    background-color: var(--surface-container-low);
+  }
+
+  .bg-on-surface-20 {
+    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+  }
+  .bg-surface-container-low\/20 {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-container-low) 20%,
+      transparent
+    );
+  }
+
+  .bg-surface {
+    background-color: var(--surface);
+  }
+  .bg-surface-container-low {
+    background-color: var(--surface-container-low);
+  }
+  .bg-surface-container-lowest {
+    background-color: var(--surface-container-lowest);
+  }
+  .bg-surface-container-high {
+    background-color: var(--surface-container-high);
+  }
+
+  .bg-surface-container-low-80 {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-container-low) 80%,
+      transparent
+    );
+  }
+  .bg-surface-container-low-40 {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-container-low) 40%,
+      transparent
+    );
+  }
+  .bg-surface-container-low-20 {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-container-low) 20%,
+      transparent
+    );
+  }
+
+  .bg-on-surface-20 {
+    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+  }
+
+  .border-outline-variant {
+    border-color: var(--outline-variant);
+  }
+  .border-outline-variant-15 {
+    border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent);
+  }
+  .border-outline-variant-30 {
+    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
+  }
+  .border-outline-variant-10 {
+    border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent);
+  }
+
+  .border-primary {
+    border-color: var(--primary);
+  }
+  .border-primary-30 {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  .text-error {
+    color: var(--error);
+  }
+  .bg-error {
+    background-color: var(--error);
+  }
+  .bg-error-container {
+    background-color: var(--error-container);
+  }
+  .border-error-container {
+    border-color: var(--error-container);
+  }
+  .text-on-error {
+    color: var(--on-error);
+  }
+  .text-error-container {
+    color: var(--error-container);
+  }
+
+  .hover\:bg-surface-container-low:hover {
+    background-color: var(--surface-container-low);
+  }
+
   /* White variations for dark mode */
-  .bg-white { background-color: var(--surface-container-lowest); }
-  .text-white { color: #ffffff; }
-  .text-white-60 { color: color-mix(in srgb, #ffffff 60%, transparent); }
-  
-  .hover\:text-white:hover { color: #ffffff; }
-  .hover\:text-red-500:hover { color: #ef4444; }
-  
-  .shadow-ambient { box-shadow: var(--shadow-ambient); }
+  .bg-white {
+    background-color: var(--surface-container-lowest);
+  }
+  .text-white {
+    color: #ffffff;
+  }
+  .text-white-60 {
+    color: color-mix(in srgb, #ffffff 60%, transparent);
+  }
+
+  .hover\:text-white:hover {
+    color: #ffffff;
+  }
+  .hover\:text-red-500:hover {
+    color: #ef4444;
+  }
+
+  .shadow-ambient {
+    box-shadow: var(--shadow-ambient);
+  }
 
   /* Status badges */
   .status-quero-ler {
     background-color: var(--status-quero-ler);
     color: var(--status-quero-ler-text);
   }
-  
+
   .status-lendo {
     background-color: var(--status-lendo);
     color: var(--status-lendo-text);
   }
-  
+
   .status-lido {
     background-color: var(--status-lido);
     color: var(--status-lido-text);

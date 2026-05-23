@@ -17,11 +17,17 @@ export default function Toast({ aviso, onFechar }: ToastProps) {
   if (!aviso) return null;
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">
+    <div
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <span className="text-sm font-medium">{aviso}</span>
       <button
         onClick={onFechar}
-        className="text-white-60 hover:text-white"
+        className="btn text-white-60 hover:text-white"
+        aria-label="Fechar aviso"
       >
         ✕
       </button>

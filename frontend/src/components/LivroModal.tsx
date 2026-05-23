@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import Button from "@/components/ui/Button";
 import { Livro, LivroForm, Status } from "../types/livros";
 
 interface LivroModalProps {
@@ -29,7 +30,8 @@ function validateField(name: string, value: unknown): string {
       return !String(value).trim() ? "Gênero é obrigatório" : "";
     case "ano":
       if (value === "" || value === undefined) return "Ano é obrigatório";
-      if (Number(value) < 1000 || Number(value) > 2030) return "Ano deve ser entre 1000 e 2030";
+      if (Number(value) < 1000 || Number(value) > 2030)
+        return "Ano deve ser entre 1000 e 2030";
       return "";
     default:
       return "";
@@ -66,11 +68,47 @@ export default function LivroModal({
     setFieldErrors({});
   }, [livro]);
 
-  const handleBlur = useCallback((name: string) => {
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    const error = validateField(name, form[name as keyof LivroForm]);
-    setFieldErrors((prev) => ({ ...prev, [name]: error }));
-  }, [form]);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = modalRef.current;
+    if (!node) return;
+    const focusable = node.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    const first = focusable[0];
+    first?.focus();
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onFechar();
+      if (e.key !== "Tab" || focusable.length === 0) return;
+      const focusArray = Array.from(focusable);
+      const idx = focusArray.indexOf(document.activeElement as HTMLElement);
+      if (e.shiftKey) {
+        if (idx === 0) {
+          focusArray[focusArray.length - 1].focus();
+          e.preventDefault();
+        }
+      } else {
+        if (idx === focusArray.length - 1) {
+          focusArray[0].focus();
+          e.preventDefault();
+        }
+      }
+    }
+
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onFechar]);
+
+  const handleBlur = useCallback(
+    (name: string) => {
+      setTouched((prev) => ({ ...prev, [name]: true }));
+      const error = validateField(name, form[name as keyof LivroForm]);
+      setFieldErrors((prev) => ({ ...prev, [name]: error }));
+    },
+    [form],
+  );
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -82,7 +120,10 @@ export default function LivroModal({
       const numValue = value === "" ? "" : Number(value);
       setForm((prev) => ({ ...prev, [name]: numValue }));
       if (touched[name]) {
-        setFieldErrors((prev) => ({ ...prev, [name]: validateField(name, numValue) }));
+        setFieldErrors((prev) => ({
+          ...prev,
+          [name]: validateField(name, numValue),
+        }));
       }
     } else if (name === "status") {
       setForm((prev) => ({
@@ -93,7 +134,10 @@ export default function LivroModal({
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
       if (touched[name]) {
-        setFieldErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+        setFieldErrors((prev) => ({
+          ...prev,
+          [name]: validateField(name, value),
+        }));
       }
     }
     setErro("");
@@ -149,6 +193,7 @@ export default function LivroModal({
       <div
         className="bg-surface border-none shadow-ambient rounded-2xl w-full max-w-lg p-8 flex flex-col gap-8 transform transition-all max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        ref={modalRef}
       >
         <div className="flex items-center justify-between">
           <div>
@@ -187,7 +232,9 @@ export default function LivroModal({
               className={getInputClass("titulo")}
             />
             {touched.titulo && fieldErrors.titulo && (
-              <span className="text-xs text-error ml-1">{fieldErrors.titulo}</span>
+              <span className="text-xs text-error ml-1">
+                {fieldErrors.titulo}
+              </span>
             )}
           </div>
 
@@ -204,7 +251,9 @@ export default function LivroModal({
               className={getInputClass("autor")}
             />
             {touched.autor && fieldErrors.autor && (
-              <span className="text-xs text-error ml-1">{fieldErrors.autor}</span>
+              <span className="text-xs text-error ml-1">
+                {fieldErrors.autor}
+              </span>
             )}
           </div>
 
@@ -221,7 +270,9 @@ export default function LivroModal({
               className={getInputClass("genero")}
             />
             {touched.genero && fieldErrors.genero && (
-              <span className="text-xs text-error ml-1">{fieldErrors.genero}</span>
+              <span className="text-xs text-error ml-1">
+                {fieldErrors.genero}
+              </span>
             )}
           </div>
 
@@ -287,7 +338,11 @@ export default function LivroModal({
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={star <= (form.avaliacao || 0) ? "text-yellow-500" : "text-on-surface-30"}
+                      className={
+                        star <= (form.avaliacao || 0)
+                          ? "text-yellow-500"
+                          : "text-on-surface-30"
+                      }
                     >
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
@@ -322,19 +377,25 @@ export default function LivroModal({
         </div>
 
         <div className="flex justify-end gap-4 pt-4">
-          <button
+          <Button
             onClick={onFechar}
-            className="btn-secondary"
+            variant="secondary"
+            className="focus-ring"
           >
             Manter na estante
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSubmit}
-            disabled={salvando}
-            className="btn-primary min-w-[140px]"
+            loading={salvando}
+            className="min-w-35 focus-ring"
+            aria-live="polite"
           >
-            {salvando ? "Curando..." : livro ? "Salvar Volume" : "Catalogar Livro"}
-          </button>
+            {salvando
+              ? "Curando..."
+              : livro
+                ? "Salvar Volume"
+                : "Catalogar Livro"}
+          </Button>
         </div>
       </div>
     </div>

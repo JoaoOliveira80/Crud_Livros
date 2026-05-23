@@ -71,8 +71,8 @@ class LivroControllerTest {
         when(service.listarPaginado(any(), any(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/livros/paginado")
-                        .param("page", "0")
-                        .param("size", "12"))
+                .param("page", "0")
+                .param("size", "12"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.totalElements", is(1)))
@@ -86,10 +86,30 @@ class LivroControllerTest {
                 .thenReturn(page);
 
         mockMvc.perform(get("/api/livros/paginado")
-                        .param("busca", "Machado")
-                        .param("genero", "Romance")
-                        .param("status", "QUERO_LER"))
+                .param("busca", "Machado")
+                .param("genero", "Romance")
+                .param("status", "QUERO_LER"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarPaginado_comStatusInvalido_deveRetornar400() throws Exception {
+        mockMvc.perform(get("/api/livros/paginado")
+                .param("status", "INVALIDO"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro", containsString("status inválido")));
+
+        verify(service, never()).listarPaginado(any(), any(), any(), any());
+    }
+
+    @Test
+    void listarPaginado_comSortByInvalido_deveRetornar400() throws Exception {
+        mockMvc.perform(get("/api/livros/paginado")
+                .param("sortBy", "naoExiste"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro", containsString("sortBy inválido")));
+
+        verify(service, never()).listarPaginado(any(), any(), any(), any());
     }
 
     @Test
@@ -115,8 +135,8 @@ class LivroControllerTest {
         when(service.criar(any(Livro.class))).thenReturn(livro);
 
         mockMvc.perform(post("/api/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(livro)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.titulo", is("Dom Casmurro")));
     }
@@ -126,8 +146,8 @@ class LivroControllerTest {
         livro.setTitulo("");
 
         mockMvc.perform(post("/api/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(livro)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erro", containsString("Título")));
     }
@@ -137,8 +157,8 @@ class LivroControllerTest {
         livro.setAutor("");
 
         mockMvc.perform(post("/api/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(livro)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erro", containsString("Autor")));
     }
@@ -148,8 +168,8 @@ class LivroControllerTest {
         livro.setAno(null);
 
         mockMvc.perform(post("/api/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(livro)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erro", containsString("Ano")));
     }
@@ -160,8 +180,8 @@ class LivroControllerTest {
         when(service.atualizar(eq(1L), any(Livro.class))).thenReturn(livro);
 
         mockMvc.perform(put("/api/livros/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(livro)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.titulo", is("Memórias Póstumas")));
     }
@@ -179,8 +199,8 @@ class LivroControllerTest {
         when(service.importar(anyList())).thenReturn(List.of(livro));
 
         mockMvc.perform(post("/api/livros/importar")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(List.of(livro))))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(List.of(livro))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$", hasSize(1)));
     }

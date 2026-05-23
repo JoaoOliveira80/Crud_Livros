@@ -9,14 +9,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/livros")
 @CrossOrigin(origins = "http://localhost:3000")
 public class LivroController {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "createdAt", "titulo", "autor", "genero", "ano", "status", "avaliacao");
 
     private final LivroService service;
 
@@ -38,13 +43,25 @@ public class LivroController {
             @RequestParam(required = false) String busca,
             @RequestParam(required = false) String genero,
             @RequestParam(required = false) String status) {
-        Sort sort = sortDir.equalsIgnoreCase("asc") 
-            ? Sort.by(sortBy).ascending() 
-            : Sort.by(sortBy).descending();
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Parâmetro sortBy inválido. Valores permitidos: " + ALLOWED_SORT_FIELDS);
+        }
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Livro.Status statusEnum = null;
         if (status != null && !status.isBlank()) {
-            statusEnum = Livro.Status.valueOf(status);
+            try {
+                statusEnum = Livro.Status.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Parâmetro status inválido. Valores permitidos: QUERO_LER, LENDO, LIDO");
+            }
         }
         return ResponseEntity.ok(service.listarPaginado(busca, genero, statusEnum, pageable));
     }

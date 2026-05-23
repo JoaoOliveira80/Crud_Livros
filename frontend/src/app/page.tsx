@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import LivroCard from "@/components/LivroCard";
 import LivroModal from "@/components/LivroModal";
 import Toast from "@/components/Toast";
+import Button from "@/components/ui/Button";
 import ConfirmModal from "@/components/ConfirmModal";
 import SkeletonCards from "@/components/SkeletonCards";
 
@@ -21,6 +22,7 @@ export default function Home() {
   const [livroEditando, setLivroEditando] = useState<Livro | null>(null);
   const [livroDeletando, setLivroDeletando] = useState<Livro | null>(null);
   const [busca, setBusca] = useState("");
+  const [buscaAtual, setBuscaAtual] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState("");
   const [importando, setImportando] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,18 +31,35 @@ export default function Home() {
   const carregarLivros = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await livroService.listarPaginado(pagina, PAGE_SIZE);
+      const data = await livroService.listarPaginado(
+        pagina,
+        PAGE_SIZE,
+        "createdAt",
+        "desc",
+        buscaAtual || undefined,
+        generoFiltro || undefined,
+      );
       setPageData(data);
     } catch (err) {
       console.error(err);
+      mostrarAviso("Erro ao carregar livros. Tente novamente.");
     } finally {
       setLoading(false);
     }
-  }, [pagina]);
+  }, [pagina, buscaAtual, generoFiltro, mostrarAviso]);
 
   useEffect(() => {
     carregarLivros();
   }, [carregarLivros]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPagina(0);
+      setBuscaAtual(busca);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [busca]);
 
   const abrirNovo = () => {
     setLivroEditando(null);
@@ -59,27 +78,11 @@ export default function Home() {
 
   const handleSalvar = async (dados: LivroForm) => {
     if (livroEditando) {
-      const atualizado = await livroService.atualizar(livroEditando.id, dados);
-      setPageData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          content: prev.content.map((l) =>
-            l.id === livroEditando.id ? atualizado : l
-          ),
-        };
-      });
+      await livroService.atualizar(livroEditando.id, dados);
     } else {
-      const criado = await livroService.criar(dados);
-      setPageData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          content: [criado, ...prev.content],
-          totalElements: prev.totalElements + 1,
-        };
-      });
+      await livroService.criar(dados);
     }
+    await carregarLivros();
     fecharModal();
   };
 
@@ -92,14 +95,7 @@ export default function Home() {
     if (!livroDeletando) return;
     try {
       await livroService.deletar(livroDeletando.id);
-      setPageData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          content: prev.content.filter((l) => l.id !== livroDeletando.id),
-          totalElements: prev.totalElements - 1,
-        };
-      });
+      await carregarLivros();
       setLivroDeletando(null);
     } catch (err) {
       console.error("Erro ao deletar:", err);
@@ -107,15 +103,9 @@ export default function Home() {
     }
   };
 
-  const livrosFiltrados = (pageData?.content || []).filter((l) => {
-    const matchesBusca =
-      l.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-      l.autor.toLowerCase().includes(busca.toLowerCase());
-    const matchesGenero = generoFiltro === "" || l.genero === generoFiltro;
-    return matchesBusca && matchesGenero;
-  });
-
-  const generos = Array.from(new Set((pageData?.content || []).map((l) => l.genero)));
+  const generos = Array.from(
+    new Set((pageData?.content || []).map((l) => l.genero)),
+  );
 
   const totalPages = pageData?.totalPages || 1;
 
@@ -140,14 +130,7 @@ export default function Home() {
       const text = await file.text();
       const livros = JSON.parse(text);
       const criados = await livroService.importar(livros);
-      setPageData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          content: [...criados, ...(prev.content || [])],
-          totalElements: prev.totalElements + criados.length,
-        };
-      });
+      await carregarLivros();
       mostrarAviso(`${criados.length} livros importados com sucesso!`);
     } catch (err) {
       console.error("Erro ao importar:", err);
@@ -158,10 +141,7 @@ export default function Home() {
     }
   };
 
-  const livro =
-    busca || generoFiltro
-      ? livrosFiltrados
-      : pageData?.content || [];
+  const livro = pageData?.content || [];
 
   const queroLer = livro.filter((l) => l.status === "QUERO_LER");
   const lendo = livro.filter((l) => l.status === "LENDO");
@@ -169,9 +149,12 @@ export default function Home() {
 
   return (
     <>
-      <Header onNovo={abrirNovo} onAviso={mostrarAviso} />
+      <Header
+        onNovo={abrirNovo}
+        onAviso={mostrarAviso}
+      />
 
-      <main className="max-w-5xl mx-auto px-6 py-16">
+      <main className="max-w-5xl mx-auto content-area">
         {loading ? (
           <SkeletonCards count={6} />
         ) : livro.length === 0 ? (
@@ -182,16 +165,20 @@ export default function Home() {
               Cada livro é uma janela para um novo mundo.
             </p>
             <div className="flex items-center gap-4 mt-4">
-              <button onClick={abrirNovo} className="btn-primary">
+              <Button
+                onClick={abrirNovo}
+                variant="primary"
+              >
                 Adicionar o primeiro volume
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => fileInputRef.current?.click()}
-                disabled={importando}
-                className="btn-secondary disabled:opacity-50"
+                variant="secondary"
+                loading={importando}
+                aria-busy={importando}
               >
                 {importando ? "Importando..." : "Importar Biblioteca"}
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -202,7 +189,7 @@ export default function Home() {
                 <br />
                 <span className="italic">A curadoria é uma arte.</span>
               </h2>
-              <p className="text-on-surface-60 mt-6 leading-relaxed text-lg">
+              <p className="lead mt-6 leading-relaxed text-lg">
                 Explore sua coleção pessoal e acompanhe sua jornada literária.
                 Sua estante agora conta com{" "}
                 <span className="text-primary font-bold">{livro.length}</span>{" "}
@@ -221,13 +208,19 @@ export default function Home() {
                 </div>
                 <select
                   value={generoFiltro}
-                  onChange={(e) => setGeneroFiltro(e.target.value)}
+                  onChange={(e) => {
+                    setGeneroFiltro(e.target.value);
+                    setPagina(0);
+                  }}
                   aria-label="Filtrar por gênero"
                   className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-30 transition-colors cursor-pointer"
                 >
                   <option value="">Todos os Gêneros</option>
                   {generos.map((g) => (
-                    <option key={g} value={g}>
+                    <option
+                      key={g}
+                      value={g}
+                    >
                       {g}
                     </option>
                   ))}
@@ -237,7 +230,9 @@ export default function Home() {
                   <button
                     onClick={() => {
                       setBusca("");
+                      setBuscaAtual("");
                       setGeneroFiltro("");
+                      setPagina(0);
                     }}
                     className="text-xs font-bold uppercase tracking-widest text-primary hover:underline px-2"
                   >
@@ -302,25 +297,29 @@ export default function Home() {
                     Ações Rápidas
                   </h3>
                   <div className="flex flex-col gap-3">
-                    <button
+                    <Button
                       onClick={abrirNovo}
-                      className="btn-primary w-full text-sm"
+                      variant="primary"
+                      className="w-full text-sm"
                     >
                       + Novo Volume
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={exportarJSON}
-                      className="btn-secondary w-full text-sm"
+                      variant="secondary"
+                      className="w-full text-sm"
                     >
                       ↓ Exportar Biblioteca
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => fileInputRef.current?.click()}
-                      disabled={importando}
-                      className="btn-secondary w-full text-sm disabled:opacity-50"
+                      variant="secondary"
+                      className="w-full text-sm"
+                      loading={importando}
+                      aria-busy={importando}
                     >
                       {importando ? "Importando..." : "↑ Importar Biblioteca"}
-                    </button>
+                    </Button>
                   </div>
 
                   {lidos.length > 0 && (
@@ -330,7 +329,10 @@ export default function Home() {
                       </h4>
                       <div className="flex flex-col gap-6">
                         {lidos.slice(0, 3).map((l) => (
-                          <div key={l.id} className="group cursor-pointer">
+                          <div
+                            key={l.id}
+                            className="group cursor-pointer"
+                          >
                             <p className="text-sm font-serif text-primary truncate group-hover:text-primary-container transition-colors">
                               {l.titulo}
                             </p>
@@ -369,7 +371,7 @@ export default function Home() {
               )}
             </div>
 
-            {totalPages > 1 && !busca && !generoFiltro && (
+            {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-16">
                 <button
                   onClick={() => setPagina((p) => Math.max(0, p - 1))}
@@ -382,7 +384,9 @@ export default function Home() {
                   {pagina + 1} / {totalPages}
                 </span>
                 <button
-                  onClick={() => setPagina((p) => Math.min(totalPages - 1, p + 1))}
+                  onClick={() =>
+                    setPagina((p) => Math.min(totalPages - 1, p + 1))
+                  }
                   disabled={pagina >= totalPages - 1}
                   className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
                 >
@@ -425,11 +429,16 @@ export default function Home() {
         ref={fileInputRef}
         type="file"
         accept=".json"
+        aria-label="Selecionar arquivo JSON para importar"
+        title="Selecionar arquivo JSON para importar"
         onChange={importarJSON}
         className="hidden"
       />
 
-      <Toast aviso={aviso} onFechar={fecharAviso} />
+      <Toast
+        aviso={aviso}
+        onFechar={fecharAviso}
+      />
     </>
   );
 }

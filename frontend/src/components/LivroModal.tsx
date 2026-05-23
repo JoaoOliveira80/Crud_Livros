@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Button from "@/components/ui/Button";
+import { GENEROS_LITERARIOS } from "@/constants/generos";
 import { Livro, LivroForm, Status } from "../types/livros";
 
 interface LivroModalProps {
@@ -258,17 +259,27 @@ export default function LivroModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1">
+            <label
+              htmlFor="genero-select"
+              className="text-[10px] font-bold text-on-surface-40 uppercase tracking-widest ml-1"
+            >
               Gênero Literário
             </label>
-            <input
+            <select
+              id="genero-select"
               name="genero"
               value={form.genero}
               onChange={handleChange}
               onBlur={() => handleBlur("genero")}
-              placeholder="Ex: Realismo"
-              className={getInputClass("genero")}
-            />
+              className={`${getInputClass("genero")} appearance-none cursor-pointer`}
+            >
+              <option value="">Selecione um gênero</option>
+              {GENEROS_LITERARIOS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
             {touched.genero && fieldErrors.genero && (
               <span className="text-xs text-error ml-1">
                 {fieldErrors.genero}

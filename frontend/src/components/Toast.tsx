@@ -18,7 +18,7 @@ export default function Toast({ aviso, onFechar }: ToastProps) {
 
   return (
     <div
-      className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-50 animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3"
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-6 py-3 rounded-full shadow-ambient z-50 flex items-center gap-3 border border-primary-30"
       role="status"
       aria-live="polite"
       aria-atomic="true"
@@ -26,7 +26,7 @@ export default function Toast({ aviso, onFechar }: ToastProps) {
       <span className="text-sm font-medium">{aviso}</span>
       <button
         onClick={onFechar}
-        className="btn text-white-60 hover:text-white"
+        className="btn opacity-70 hover:opacity-100 text-on-primary"
         aria-label="Fechar aviso"
       >
         ✕

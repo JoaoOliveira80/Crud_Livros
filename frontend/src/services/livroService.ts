@@ -1,6 +1,7 @@
 import { Livro, LivroForm, PageResponse } from "../types/livros";
 
-const BASE_URL = "http://localhost:8080/api/livros";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/livros";
 
 export const livroService = {
   async listarTodos(): Promise<Livro[]> {

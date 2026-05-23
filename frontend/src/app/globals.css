@@ -4,17 +4,6 @@
   --font-serif: var(--font-newsreader);
   --font-sans: var(--font-manrope);
 
-  --color-surface: #fbf9f4;
-  --color-surface-container-low: #f5f3ee;
-  --color-surface-container-lowest: #ffffff;
-  --color-primary: #2a4b5d;
-  --color-primary-container: #3d5f73;
-  --color-secondary: #4a654e;
-  --color-on-surface: #1b1c19;
-  --color-outline-variant: #c2c7cc;
-
-  --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
-  /* Spacing scale */
   --space-1: 6px;
   --space-2: 12px;
   --space-3: 16px;
@@ -24,83 +13,94 @@
   --container-max-width: 1200px;
 }
 
-:root {
-  /* Modo Claro - Athenaeum Ivory */
-  --surface: #fbf9f4;
-  --surface-container-low: #f5f3ee;
+/* ─── Modo claro: Athenaeum Ivory ─── */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --surface: #faf7f2;
+  --surface-container-low: #f2ede6;
   --surface-container-lowest: #ffffff;
-  --surface-container-high: #ffffff;
+  --surface-container-high: #e8e2d9;
 
-  --primary: #2a4b5d;
-  --primary-container: #d4e5ed;
+  --primary: #1e4a5c;
+  --primary-hover: #163a49;
+  --primary-container: #c5dde8;
   --on-primary: #ffffff;
-  --on-primary-container: #1a3a47;
+  --on-primary-container: #0f3340;
 
-  --secondary: #4a654e;
-  --secondary-container: #cde7d0;
+  --secondary: #3a6344;
+  --secondary-container: #d4e8d8;
   --on-secondary: #ffffff;
-  --on-secondary-container: #1e4620;
+  --on-secondary-container: #1a3d24;
 
-  --on-surface: #1b1c19;
-  --on-surface-variant: #45483d;
-  --outline-variant: #c2c7cc;
+  --on-surface: #1c1b18;
+  --on-surface-variant: #565850;
+  --outline-variant: #b8bdb8;
 
-  /* Status Colors - Modo Claro */
-  --status-quero-ler: #d1e9ff;
-  --status-quero-ler-text: #1a3a5c;
-  --status-lendo: #cde7d0;
-  --status-lendo-text: #1e4620;
-  --status-lido: #eac2b5;
-  --status-lido-text: #5c3a2a;
+  --status-quero-ler: #c8e4f8;
+  --status-quero-ler-text: #134066;
+  --status-lendo: #c8e6cc;
+  --status-lendo-text: #1a4a28;
+  --status-lido: #f0d4c8;
+  --status-lido-text: #6b3d2a;
 
-  /* Error */
-  --error: #d32f2f;
-  --error-container: #fdecea;
+  --error: #b3261e;
+  --error-container: #fde8e6;
   --on-error: #ffffff;
-  --on-error-container: #5c1616;
+  --on-error-container: #5c1210;
 
-  --shadow-ambient: 0 8px 40px rgba(27, 28, 25, 0.06);
+  --shadow-ambient: 0 4px 24px rgba(30, 74, 92, 0.08);
+  --shadow-card-hover: 0 12px 32px rgba(30, 74, 92, 0.12);
+  --overlay-scrim: rgba(28, 27, 24, 0.45);
 }
 
+/* ─── Modo escuro: Athenaeum Obsidian ─── */
 [data-theme="dark"] {
-  /* Modo Escuro - Athenaeum Obsidian */
-  --surface: #141418;
-  --surface-container-lowest: #1c1c22;
-  --surface-container-low: #222230;
-  --surface-container-high: #2e2e3c;
+  color-scheme: dark;
 
-  --primary: #88b5c8;
-  --primary-container: #2a4b5d;
-  --on-primary: #0d1b21;
-  --on-primary-container: #c5e4ed;
+  --surface: #101218;
+  --surface-container-low: #1a1d26;
+  --surface-container-lowest: #151820;
+  --surface-container-high: #262a36;
 
-  --secondary: #8fb896;
-  --secondary-container: #1e4620;
-  --on-secondary: #0d1b21;
-  --on-secondary-container: #b4dcc0;
+  --primary: #9ecfe3;
+  --primary-hover: #b5ddf0;
+  --primary-container: #243d4d;
+  --on-primary: #061018;
+  --on-primary-container: #d4ecf7;
 
-  --on-surface: #e4e2dc;
-  --on-surface-variant: #a0a09a;
-  --outline-variant: #4a4a48;
+  --secondary: #9ec9a8;
+  --secondary-container: #1e3d2a;
+  --on-secondary: #061018;
+  --on-secondary-container: #c8e8cf;
 
-  /* Status Colors - Modo Escuro */
-  --status-quero-ler: #1a3a5c;
-  --status-quero-ler-text: #a8d4ff;
-  --status-lendo: #1e4620;
-  --status-lendo-text: #b4dcc0;
-  --status-lido: #5c3a2a;
-  --status-lido-text: #ffcbb3;
+  --on-surface: #ebe8e2;
+  --on-surface-variant: #a8a59e;
+  --outline-variant: #434851;
 
-  /* Error */
-  --error: #ef5350;
-  --error-container: #5c2020;
-  --on-error: #ffffff;
-  --on-error-container: #ffcdd2;
+  --status-quero-ler: #1e3d5c;
+  --status-quero-ler-text: #a8d8f8;
+  --status-lendo: #1e3d28;
+  --status-lendo-text: #a8ddb4;
+  --status-lido: #4a3024;
+  --status-lido-text: #f0c8b4;
 
-  --shadow-ambient: 0 8px 40px rgba(10, 10, 18, 0.5);
+  --error: #f2b8b5;
+  --error-container: #601410;
+  --on-error: #601410;
+  --on-error-container: #f9dedc;
+
+  --shadow-ambient: 0 4px 28px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 12px 36px rgba(0, 0, 0, 0.45);
+  --overlay-scrim: rgba(0, 0, 0, 0.55);
 }
 
 @layer base {
+  html {
+    background-color: var(--surface);
+  }
+
   body {
     background-color: var(--surface);
     color: var(--on-surface);
@@ -108,19 +108,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
-    /* subtle radial paper texture for depth */
+      background-color 0.25s ease,
+      color 0.25s ease;
     background-image:
       radial-gradient(
-        circle at 10% 10%,
-        rgba(0, 0, 0, 0.01) 0px,
-        transparent 40px
+        ellipse 80% 50% at 0% 0%,
+        color-mix(in srgb, var(--primary) 7%, transparent),
+        transparent 55%
       ),
       radial-gradient(
-        circle at 90% 90%,
-        rgba(0, 0, 0, 0.01) 0px,
-        transparent 60px
+        ellipse 70% 45% at 100% 100%,
+        color-mix(in srgb, var(--secondary) 6%, transparent),
+        transparent 50%
       );
   }
 
@@ -150,7 +149,12 @@
 
   .lead {
     font-size: 1.0625rem;
-    color: color-mix(in srgb, var(--on-surface) 80%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 78%, transparent);
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--primary) 35%, transparent);
+    color: var(--on-surface);
   }
 }
 
@@ -158,27 +162,27 @@
   .glass {
     background-color: color-mix(
       in srgb,
-      var(--surface-container-low) 80%,
+      var(--surface-container-lowest) 72%,
       transparent
     );
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border-bottom: 1px solid color-mix(in srgb, var(--outline-variant) 40%, transparent);
   }
 
   .btn-primary {
-    background: linear-gradient(
-      to bottom right,
-      var(--primary),
-      var(--primary-container)
-    );
+    background-color: var(--primary);
     color: var(--on-primary);
     padding: 10px 24px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 700;
-    transition: all 0.16s ease;
+    transition:
+      background-color 0.16s ease,
+      transform 0.16s ease,
+      box-shadow 0.16s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 30%, transparent);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -186,20 +190,25 @@
   }
 
   .btn-primary:hover {
-    filter: brightness(1.1);
-    transform: scale(1.02);
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 35%, transparent);
   }
 
   .btn-primary:active {
-    transform: scale(0.98);
+    transform: translateY(0);
+  }
+
+  [data-theme="dark"] .btn-primary {
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .btn-secondary {
-    background-color: transparent;
-    border: 1px solid var(--outline-variant);
+    background-color: var(--surface-container-lowest);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 80%, transparent);
     color: var(--on-surface);
     padding: 10px 24px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 500;
     transition: all 0.16s ease;
     cursor: pointer;
@@ -207,21 +216,25 @@
 
   .btn-secondary:hover {
     background-color: var(--surface-container-low);
-    border-color: var(--on-surface-variant);
+    border-color: var(--primary);
+    color: var(--primary);
   }
 
   .card-ambient {
     background-color: var(--surface-container-lowest);
+    border: 1px solid color-mix(in srgb, var(--outline-variant) 25%, transparent);
     box-shadow: var(--shadow-ambient);
-    border-radius: 8px;
+    border-radius: 12px;
     transition:
       transform 0.18s ease,
-      box-shadow 0.18s ease;
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
   }
+
   .card-ambient:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 36px
-      color-mix(in srgb, var(--on-surface) 8%, transparent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .content-area {
@@ -231,17 +244,12 @@
     padding-bottom: var(--space-6);
   }
 
-  .card-padding {
-    padding: var(--space-4);
-  }
-
-  /* skeleton loading */
   .skeleton {
     background: linear-gradient(
       90deg,
-      color-mix(in srgb, var(--surface-container-low) 60%, transparent) 0%,
-      color-mix(in srgb, var(--surface-container-low) 40%, transparent) 50%,
-      color-mix(in srgb, var(--surface-container-low) 60%, transparent) 100%
+      color-mix(in srgb, var(--surface-container-low) 70%, transparent) 0%,
+      color-mix(in srgb, var(--surface-container-high) 50%, transparent) 50%,
+      color-mix(in srgb, var(--surface-container-low) 70%, transparent) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.2s linear infinite;
@@ -256,7 +264,6 @@
     }
   }
 
-  /* Button base to standardize sizes and focus */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -264,21 +271,20 @@
     gap: 8px;
     min-height: 40px;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
   }
 
   .btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 
   .focus-ring:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
     outline-offset: 2px;
   }
 
-  /* small spinner */
   .spinner {
     width: 16px;
     height: 16px;
@@ -294,9 +300,11 @@
     }
   }
 
-  /* Custom utility classes for opacity */
   .text-primary {
     color: var(--primary);
+  }
+  .text-secondary {
+    color: var(--secondary);
   }
   .bg-primary {
     background-color: var(--primary);
@@ -307,46 +315,36 @@
   .text-primary-container {
     color: var(--primary-container);
   }
+  .text-on-primary-container {
+    color: var(--on-primary-container);
+  }
+  .text-on-primary {
+    color: var(--on-primary);
+  }
+  .bg-outline-variant-30 {
+    background-color: color-mix(in srgb, var(--outline-variant) 35%, transparent);
+  }
 
   .text-on-surface {
     color: var(--on-surface);
   }
-  .bg-on-surface {
-    background-color: var(--on-surface);
-  }
-
   .text-on-surface-40 {
-    color: color-mix(in srgb, var(--on-surface) 40%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 42%, transparent);
   }
   .text-on-surface-50 {
-    color: color-mix(in srgb, var(--on-surface) 50%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 52%, transparent);
   }
   .text-on-surface-60 {
-    color: color-mix(in srgb, var(--on-surface) 60%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 62%, transparent);
   }
   .text-on-surface-70 {
-    color: color-mix(in srgb, var(--on-surface) 70%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 72%, transparent);
   }
   .text-on-surface-30 {
-    color: color-mix(in srgb, var(--on-surface) 30%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 32%, transparent);
   }
   .text-on-surface-20 {
-    color: color-mix(in srgb, var(--on-surface) 20%, transparent);
-  }
-
-  .bg-surface-container-low {
-    background-color: var(--surface-container-low);
-  }
-
-  .bg-on-surface-20 {
-    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
-  }
-  .bg-surface-container-low\/20 {
-    background-color: color-mix(
-      in srgb,
-      var(--surface-container-low) 20%,
-      transparent
-    );
+    color: color-mix(in srgb, var(--on-surface) 22%, transparent);
   }
 
   .bg-surface {
@@ -361,111 +359,144 @@
   .bg-surface-container-high {
     background-color: var(--surface-container-high);
   }
-
-  .bg-surface-container-low-80 {
-    background-color: color-mix(
-      in srgb,
-      var(--surface-container-low) 80%,
-      transparent
-    );
-  }
-  .bg-surface-container-low-40 {
-    background-color: color-mix(
-      in srgb,
-      var(--surface-container-low) 40%,
-      transparent
-    );
-  }
-  .bg-surface-container-low-20 {
-    background-color: color-mix(
-      in srgb,
-      var(--surface-container-low) 20%,
-      transparent
-    );
-  }
-
   .bg-on-surface-20 {
-    background-color: color-mix(in srgb, var(--on-surface) 20%, transparent);
+    background-color: var(--overlay-scrim);
   }
 
   .border-outline-variant {
     border-color: var(--outline-variant);
   }
   .border-outline-variant-15 {
-    border-color: color-mix(in srgb, var(--outline-variant) 15%, transparent);
+    border-color: color-mix(in srgb, var(--outline-variant) 22%, transparent);
   }
   .border-outline-variant-30 {
-    border-color: color-mix(in srgb, var(--outline-variant) 30%, transparent);
+    border-color: color-mix(in srgb, var(--outline-variant) 45%, transparent);
   }
   .border-outline-variant-10 {
-    border-color: color-mix(in srgb, var(--outline-variant) 10%, transparent);
-  }
-
-  .border-primary {
-    border-color: var(--primary);
+    border-color: color-mix(in srgb, var(--outline-variant) 18%, transparent);
   }
   .border-primary-30 {
-    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
   }
 
   .text-error {
     color: var(--error);
   }
-  .bg-error {
-    background-color: var(--error);
-  }
   .bg-error-container {
     background-color: var(--error-container);
   }
   .border-error-container {
-    border-color: var(--error-container);
+    border-color: color-mix(in srgb, var(--error) 35%, transparent);
   }
-  .text-on-error {
-    color: var(--on-error);
-  }
-  .text-error-container {
-    color: var(--error-container);
+  .text-on-error-container {
+    color: var(--on-error-container);
   }
 
   .hover\:bg-surface-container-low:hover {
     background-color: var(--surface-container-low);
   }
 
-  /* White variations for dark mode */
-  .bg-white {
-    background-color: var(--surface-container-lowest);
-  }
-  .text-white {
-    color: #ffffff;
-  }
-  .text-white-60 {
-    color: color-mix(in srgb, #ffffff 60%, transparent);
-  }
-
-  .hover\:text-white:hover {
-    color: #ffffff;
-  }
-  .hover\:text-red-500:hover {
-    color: #ef4444;
-  }
-
   .shadow-ambient {
     box-shadow: var(--shadow-ambient);
   }
 
-  /* Status badges */
   .status-quero-ler {
     background-color: var(--status-quero-ler);
     color: var(--status-quero-ler-text);
   }
-
   .status-lendo {
     background-color: var(--status-lendo);
     color: var(--status-lendo-text);
   }
-
   .status-lido {
     background-color: var(--status-lido);
     color: var(--status-lido-text);
+  }
+
+  /* Capas por gênero */
+  .book-cover {
+    background-image: linear-gradient(
+      145deg,
+      var(--cover-from) 0%,
+      var(--cover-to) 100%
+    );
+  }
+
+  .book-cover--ficcao {
+    --cover-from: #b8dff5;
+    --cover-to: #8eb5e8;
+  }
+  .book-cover--nao-ficcao {
+    --cover-from: #f5e6b8;
+    --cover-to: #e8c48e;
+  }
+  .book-cover--fantasia {
+    --cover-from: #e4d0f5;
+    --cover-to: #d4a8e8;
+  }
+  .book-cover--romance {
+    --cover-from: #f5d0d8;
+    --cover-to: #e8a8b5;
+  }
+  .book-cover--terror {
+    --cover-from: #d0d5dc;
+    --cover-to: #a8b0b8;
+  }
+  .book-cover--ficcao-cientifica {
+    --cover-from: #b8f0f5;
+    --cover-to: #78d8d0;
+  }
+  .book-cover--biografia {
+    --cover-from: #c8ecd4;
+    --cover-to: #88d8a8;
+  }
+  .book-cover--historia {
+    --cover-from: #f5eeb8;
+    --cover-to: #e8d878;
+  }
+  .book-cover--poesia {
+    --cover-from: #ddd0f5;
+    --cover-to: #d0a8e8;
+  }
+  .book-cover--default {
+    --cover-from: var(--surface-container-low);
+    --cover-to: var(--surface-container-high);
+  }
+
+  [data-theme="dark"] .book-cover--ficcao {
+    --cover-from: #1a3d52;
+    --cover-to: #2a4a6b;
+  }
+  [data-theme="dark"] .book-cover--nao-ficcao {
+    --cover-from: #4a3820;
+    --cover-to: #6b4a28;
+  }
+  [data-theme="dark"] .book-cover--fantasia {
+    --cover-from: #3d2858;
+    --cover-to: #5a3878;
+  }
+  [data-theme="dark"] .book-cover--romance {
+    --cover-from: #4a2838;
+    --cover-to: #6b3848;
+  }
+  [data-theme="dark"] .book-cover--terror {
+    --cover-from: #282c34;
+    --cover-to: #3a4048;
+  }
+  [data-theme="dark"] .book-cover--ficcao-cientifica {
+    --cover-from: #1a4048;
+    --cover-to: #285860;
+  }
+  [data-theme="dark"] .book-cover--biografia {
+    --cover-from: #1a3828;
+    --cover-to: #285040;
+  }
+  [data-theme="dark"] .book-cover--historia {
+    --cover-from: #403820;
+    --cover-to: #585028;
+  }
+  [data-theme="dark"] .book-cover--poesia {
+    --cover-from: #382858;
+    --cover-to: #503870;
   }
 }

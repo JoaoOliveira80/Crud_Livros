@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Livro, LivroForm, PageResponse } from "@/types/livros";
+import { useState, useRef } from "react";
+import Link from "next/link";
+import { Livro, LivroForm } from "@/types/livros";
 import { livroService } from "@/services/livroService";
 import { useToast } from "@/hooks/useToast";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useLivrosLista } from "@/hooks/useLivrosLista";
+import { generosParaSelect } from "@/constants/generos";
 import Header from "@/components/Header";
 import LivroCard from "@/components/LivroCard";
 import LivroModal from "@/components/LivroModal";
@@ -11,55 +15,23 @@ import Toast from "@/components/Toast";
 import Button from "@/components/ui/Button";
 import ConfirmModal from "@/components/ConfirmModal";
 import SkeletonCards from "@/components/SkeletonCards";
-
-const PAGE_SIZE = 12;
+import LivrosFiltros from "@/components/LivrosFiltros";
 
 export default function Home() {
-  const [pagina, setPagina] = useState(0);
-  const [pageData, setPageData] = useState<PageResponse<Livro> | null>(null);
-  const [loading, setLoading] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [livroEditando, setLivroEditando] = useState<Livro | null>(null);
   const [livroDeletando, setLivroDeletando] = useState<Livro | null>(null);
   const [busca, setBusca] = useState("");
-  const [buscaAtual, setBuscaAtual] = useState("");
   const [generoFiltro, setGeneroFiltro] = useState("");
   const [importando, setImportando] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { aviso, mostrarAviso, fecharAviso } = useToast();
 
-  const carregarLivros = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await livroService.listarPaginado(
-        pagina,
-        PAGE_SIZE,
-        "createdAt",
-        "desc",
-        buscaAtual || undefined,
-        generoFiltro || undefined,
-      );
-      setPageData(data);
-    } catch (err) {
-      console.error(err);
-      mostrarAviso("Erro ao carregar livros. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  }, [pagina, buscaAtual, generoFiltro, mostrarAviso]);
-
-  useEffect(() => {
-    carregarLivros();
-  }, [carregarLivros]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPagina(0);
-      setBuscaAtual(busca);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [busca]);
+  const buscaDebounced = useDebouncedValue(busca, 300);
+  const { livros, totalElements, loading, error, recarregar } = useLivrosLista({
+    busca: buscaDebounced,
+    genero: generoFiltro,
+  });
 
   const abrirNovo = () => {
     setLivroEditando(null);
@@ -79,15 +51,17 @@ export default function Home() {
   const handleSalvar = async (dados: LivroForm) => {
     if (livroEditando) {
       await livroService.atualizar(livroEditando.id, dados);
+      mostrarAviso("Volume atualizado com sucesso!");
     } else {
       await livroService.criar(dados);
+      mostrarAviso("Volume catalogado com sucesso!");
     }
-    await carregarLivros();
+    await recarregar();
     fecharModal();
   };
 
   const prepararDelecao = (id: number) => {
-    const livro = pageData?.content.find((l) => l.id === id);
+    const livro = livros.find((l) => l.id === id);
     if (livro) setLivroDeletando(livro);
   };
 
@@ -95,31 +69,39 @@ export default function Home() {
     if (!livroDeletando) return;
     try {
       await livroService.deletar(livroDeletando.id);
-      await carregarLivros();
+      await recarregar();
       setLivroDeletando(null);
+      mostrarAviso("Volume removido da estante.");
     } catch (err) {
       console.error("Erro ao deletar:", err);
       mostrarAviso("Erro ao deletar o livro. Tente novamente.");
     }
   };
 
-  const generos = Array.from(
-    new Set((pageData?.content || []).map((l) => l.genero)),
-  );
+  const generos = generosParaSelect(livros.map((l) => l.genero));
+  const temFiltro = busca !== "" || generoFiltro !== "";
 
-  const totalPages = pageData?.totalPages || 1;
+  const limparFiltros = () => {
+    setBusca("");
+    setGeneroFiltro("");
+  };
 
-  const exportarJSON = () => {
-    if (!pageData?.content) return;
-    const dataStr = JSON.stringify(pageData.content, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `minha-estante-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    mostrarAviso("Biblioteca exportada com sucesso!");
+  const exportarJSON = async () => {
+    try {
+      const todos = await livroService.listarTodos();
+      const dataStr = JSON.stringify(todos, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `minha-estante-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      mostrarAviso(`${todos.length} volumes exportados com sucesso!`);
+    } catch (err) {
+      console.error(err);
+      mostrarAviso("Erro ao exportar biblioteca. Tente novamente.");
+    }
   };
 
   const importarJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,9 +110,10 @@ export default function Home() {
     setImportando(true);
     try {
       const text = await file.text();
-      const livros = JSON.parse(text);
-      const criados = await livroService.importar(livros);
-      await carregarLivros();
+      const parsed = JSON.parse(text);
+      const livrosImport = Array.isArray(parsed) ? parsed : [parsed];
+      const criados = await livroService.importar(livrosImport);
+      await recarregar();
       mostrarAviso(`${criados.length} livros importados com sucesso!`);
     } catch (err) {
       console.error("Erro ao importar:", err);
@@ -141,48 +124,57 @@ export default function Home() {
     }
   };
 
-  const livro = pageData?.content || [];
-
-  const queroLer = livro.filter((l) => l.status === "QUERO_LER");
-  const lendo = livro.filter((l) => l.status === "LENDO");
-  const lidos = livro.filter((l) => l.status === "LIDO");
+  const queroLer = livros.filter((l) => l.status === "QUERO_LER");
+  const lendo = livros.filter((l) => l.status === "LENDO");
+  const lidos = livros.filter((l) => l.status === "LIDO");
 
   return (
     <>
-      <Header
-        onNovo={abrirNovo}
-        onAviso={mostrarAviso}
-      />
+      <Header onNovo={abrirNovo} />
 
       <main className="max-w-5xl mx-auto content-area">
         {loading ? (
           <SkeletonCards count={6} />
-        ) : livro.length === 0 ? (
+        ) : livros.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6 text-on-surface-30">
-            <span className="text-7xl font-serif italic">The empty shelf.</span>
+            <span className="text-7xl font-serif italic text-center">
+              A estante está vazia.
+            </span>
             <p className="max-w-md text-center font-medium leading-relaxed">
-              Explore sua coleção pessoal e acompanhe sua jornada literária.
-              Cada livro é uma janela para um novo mundo.
+              {temFiltro
+                ? "Nenhum volume corresponde aos filtros. Tente outros termos ou limpe a busca."
+                : "Explore sua coleção pessoal e acompanhe sua jornada literária. Cada livro é uma janela para um novo mundo."}
             </p>
-            <div className="flex items-center gap-4 mt-4">
-              <Button
-                onClick={abrirNovo}
-                variant="primary"
-              >
-                Adicionar o primeiro volume
-              </Button>
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                variant="secondary"
-                loading={importando}
-                aria-busy={importando}
-              >
-                {importando ? "Importando..." : "Importar Biblioteca"}
-              </Button>
+            <div className="flex items-center gap-4 mt-4 flex-wrap justify-center">
+              {temFiltro ? (
+                <Button onClick={limparFiltros} variant="secondary">
+                  Limpar filtros
+                </Button>
+              ) : (
+                <>
+                  <Button onClick={abrirNovo} variant="primary">
+                    Adicionar o primeiro volume
+                  </Button>
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="secondary"
+                    loading={importando}
+                    aria-busy={importando}
+                  >
+                    {importando ? "Importando..." : "Importar biblioteca"}
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-24">
+            {error && (
+              <p className="text-sm text-error bg-error-container border border-error-container px-4 py-3 rounded-lg">
+                {error}
+              </p>
+            )}
+
             <header className="max-w-3xl">
               <h2 className="text-[3.5rem] font-serif leading-[1.1] text-primary tracking-tight">
                 Boa leitura,
@@ -192,65 +184,36 @@ export default function Home() {
               <p className="lead mt-6 leading-relaxed text-lg">
                 Explore sua coleção pessoal e acompanhe sua jornada literária.
                 Sua estante agora conta com{" "}
-                <span className="text-primary font-bold">{livro.length}</span>{" "}
-                volumes catalogados.
+                <span className="text-primary font-bold">{totalElements}</span>{" "}
+                volume{totalElements !== 1 ? "s" : ""} catalogado
+                {totalElements !== 1 ? "s" : ""}.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-4">
-                <div className="flex-1 min-w-70">
-                  <input
-                    type="text"
-                    placeholder="Buscar por título ou autor..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="w-full bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-30 transition-colors"
-                  />
-                </div>
-                <select
-                  value={generoFiltro}
-                  onChange={(e) => {
-                    setGeneroFiltro(e.target.value);
-                    setPagina(0);
-                  }}
-                  aria-label="Filtrar por gênero"
-                  className="bg-surface-container-low border border-outline-variant-15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary-30 transition-colors cursor-pointer"
-                >
-                  <option value="">Todos os Gêneros</option>
-                  {generos.map((g) => (
-                    <option
-                      key={g}
-                      value={g}
-                    >
-                      {g}
-                    </option>
-                  ))}
-                </select>
-
-                {(busca !== "" || generoFiltro !== "") && (
-                  <button
-                    onClick={() => {
-                      setBusca("");
-                      setBuscaAtual("");
-                      setGeneroFiltro("");
-                      setPagina(0);
-                    }}
-                    className="text-xs font-bold uppercase tracking-widest text-primary hover:underline px-2"
-                  >
-                    Limpar Filtros
-                  </button>
-                )}
+              <div className="mt-8">
+                <LivrosFiltros
+                  busca={busca}
+                  onBuscaChange={setBusca}
+                  generoFiltro={generoFiltro}
+                  onGeneroChange={setGeneroFiltro}
+                  generos={generos}
+                  onLimpar={limparFiltros}
+                  temFiltro={temFiltro}
+                />
               </div>
             </header>
 
             <div className="flex flex-col gap-20">
               {lendo.length > 0 && (
-                <section>
+                <section aria-labelledby="secao-lendo">
                   <div className="flex items-baseline justify-between mb-8">
-                    <h3 className="text-2xl font-serif text-primary">
-                      Atualmente Lendo
+                    <h3
+                      id="secao-lendo"
+                      className="text-2xl font-serif text-primary"
+                    >
+                      Atualmente lendo
                     </h3>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-30">
-                      {lendo.length} ATIVOS
+                      {lendo.length} ativo{lendo.length !== 1 ? "s" : ""}
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -269,13 +232,17 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                 <div className="lg:col-span-8">
                   {queroLer.length > 0 && (
-                    <section>
+                    <section aria-labelledby="secao-quero-ler">
                       <div className="flex items-baseline justify-between mb-8">
-                        <h3 className="text-2xl font-serif text-primary">
-                          Próximos da Lista
+                        <h3
+                          id="secao-quero-ler"
+                          className="text-2xl font-serif text-primary"
+                        >
+                          Próximos da lista
                         </h3>
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-30">
-                          {queroLer.length} DESEJOS
+                          {queroLer.length} desejo
+                          {queroLer.length !== 1 ? "s" : ""}
                         </span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -294,7 +261,7 @@ export default function Home() {
 
                 <aside className="lg:col-span-4 bg-surface-container-low p-8 rounded-2xl h-fit sticky top-28">
                   <h3 className="text-xl font-serif text-primary mb-6">
-                    Ações Rápidas
+                    Ações rápidas
                   </h3>
                   <div className="flex flex-col gap-3">
                     <Button
@@ -302,14 +269,14 @@ export default function Home() {
                       variant="primary"
                       className="w-full text-sm"
                     >
-                      + Novo Volume
+                      + Novo volume
                     </Button>
                     <Button
                       onClick={exportarJSON}
                       variant="secondary"
                       className="w-full text-sm"
                     >
-                      ↓ Exportar Biblioteca
+                      ↓ Exportar biblioteca
                     </Button>
                     <Button
                       onClick={() => fileInputRef.current?.click()}
@@ -318,28 +285,30 @@ export default function Home() {
                       loading={importando}
                       aria-busy={importando}
                     >
-                      {importando ? "Importando..." : "↑ Importar Biblioteca"}
+                      {importando ? "Importando..." : "↑ Importar biblioteca"}
                     </Button>
                   </div>
 
                   {lidos.length > 0 && (
                     <div className="mt-12">
                       <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-30 mb-4">
-                        Recentemente Concluídos
+                        Recentemente concluídos
                       </h4>
                       <div className="flex flex-col gap-6">
                         {lidos.slice(0, 3).map((l) => (
-                          <div
+                          <button
                             key={l.id}
-                            className="group cursor-pointer"
+                            type="button"
+                            onClick={() => abrirEditar(l)}
+                            className="group text-left cursor-pointer focus-ring rounded"
                           >
-                            <p className="text-sm font-serif text-primary truncate group-hover:text-primary-container transition-colors">
+                            <p className="text-sm font-serif text-primary truncate group-hover:text-on-primary-container transition-colors">
                               {l.titulo}
                             </p>
                             <p className="text-[10px] text-on-surface-40 uppercase mt-0.5">
                               {l.autor}
                             </p>
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -348,14 +317,20 @@ export default function Home() {
               </div>
 
               {lidos.length > 3 && (
-                <section>
+                <section aria-labelledby="secao-lidos">
                   <div className="flex items-baseline justify-between mb-8">
-                    <h3 className="text-2xl font-serif text-primary">
-                      Histórico de Leitura
+                    <h3
+                      id="secao-lidos"
+                      className="text-2xl font-serif text-primary"
+                    >
+                      Histórico de leitura
                     </h3>
-                    <button className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">
-                      Ver Todos
-                    </button>
+                    <Link
+                      href="/biblioteca?status=LIDO"
+                      className="text-xs font-bold uppercase tracking-widest text-primary hover:underline"
+                    >
+                      Ver todos
+                    </Link>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {lidos.slice(3).map((l) => (
@@ -370,30 +345,6 @@ export default function Home() {
                 </section>
               )}
             </div>
-
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-16">
-                <button
-                  onClick={() => setPagina((p) => Math.max(0, p - 1))}
-                  disabled={pagina === 0}
-                  className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
-                >
-                  Anterior
-                </button>
-                <span className="text-sm text-on-surface-60 px-4">
-                  {pagina + 1} / {totalPages}
-                </span>
-                <button
-                  onClick={() =>
-                    setPagina((p) => Math.min(totalPages - 1, p + 1))
-                  }
-                  disabled={pagina >= totalPages - 1}
-                  className="px-4 py-2 rounded-lg border border-outline-variant-15 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-low transition-colors"
-                >
-                  Próxima
-                </button>
-              </div>
-            )}
           </div>
         )}
       </main>
@@ -408,7 +359,7 @@ export default function Home() {
 
       {livroDeletando && (
         <ConfirmModal
-          titulo="Remover Volume?"
+          titulo="Remover volume?"
           mensagem={
             <>
               Você está prestes a remover{" "}
@@ -418,8 +369,8 @@ export default function Home() {
               da sua estante. Esta ação não pode ser desfeita.
             </>
           }
-          textoConfirmar="Confirmar Remoção"
-          textoCancelar="Manter na Coleção"
+          textoConfirmar="Confirmar remoção"
+          textoCancelar="Manter na coleção"
           onConfirmar={confirmarDelecao}
           onCancelar={() => setLivroDeletando(null)}
         />
@@ -435,10 +386,7 @@ export default function Home() {
         className="hidden"
       />
 
-      <Toast
-        aviso={aviso}
-        onFechar={fecharAviso}
-      />
+      <Toast aviso={aviso} onFechar={fecharAviso} />
     </>
   );
 }

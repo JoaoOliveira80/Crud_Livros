@@ -12,28 +12,20 @@ const statusConfig = {
   LIDO: { label: "Lido", className: "status-lido" },
 };
 
-const generoGradients: Record<string, string> = {
-  Ficção: "from-sky-200 to-indigo-200 dark:from-sky-900 dark:to-indigo-900",
-  "Não-ficção":
-    "from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900",
-  Fantasia: "from-purple-200 to-pink-200 dark:from-purple-900 dark:to-pink-900",
-  Romance: "from-rose-200 to-red-200 dark:from-rose-900 dark:to-red-900",
-  Terror: "from-slate-300 to-zinc-400 dark:from-slate-800 dark:to-zinc-800",
-  "Ficção Científica":
-    "from-cyan-200 to-teal-200 dark:from-cyan-900 dark:to-teal-900",
-  Biografia:
-    "from-emerald-200 to-green-200 dark:from-emerald-900 dark:to-green-900",
-  História:
-    "from-yellow-200 to-amber-200 dark:from-yellow-900 dark:to-amber-900",
-  Poesia:
-    "from-violet-200 to-fuchsia-200 dark:from-violet-900 dark:to-fuchsia-900",
+const generoCoverClass: Record<string, string> = {
+  Ficção: "book-cover--ficcao",
+  "Não-ficção": "book-cover--nao-ficcao",
+  Fantasia: "book-cover--fantasia",
+  Romance: "book-cover--romance",
+  Terror: "book-cover--terror",
+  "Ficção Científica": "book-cover--ficcao-cientifica",
+  Biografia: "book-cover--biografia",
+  História: "book-cover--historia",
+  Poesia: "book-cover--poesia",
 };
 
-function getCoverGradient(genero: string): string {
-  return (
-    generoGradients[genero] ||
-    "from-surface-container-low to-surface-container-lowest"
-  );
+function getCoverClass(genero: string): string {
+  return generoCoverClass[genero] ?? "book-cover--default";
 }
 
 function Estrelas({ avaliacao }: { avaliacao?: number }) {
@@ -76,7 +68,7 @@ export default function LivroCard({
   return (
     <div className="card-ambient flex flex-col hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
       <div
-        className={`w-full h-44 bg-linear-to-br ${getCoverGradient(livro.genero)} flex items-center justify-center`}
+        className={`book-cover w-full h-44 ${getCoverClass(livro.genero)} flex items-center justify-center`}
         role="img"
         aria-label={`Capa estilizada - gênero ${livro.genero}`}
       >
@@ -128,20 +120,22 @@ export default function LivroCard({
           </p>
         )}
 
-        <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-30">
+        <div className="flex items-center justify-between mt-auto pt-2 gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-30 truncate">
             {livro.genero}
           </span>
-          <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-3 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
             <button
+              type="button"
               onClick={() => onEditar(livro)}
-              className="text-xs font-bold text-primary hover:underline"
+              className="text-xs font-bold text-primary hover:underline focus-ring rounded"
             >
               Editar
             </button>
             <button
+              type="button"
               onClick={() => onDeletar(livro.id)}
-              className="text-xs font-bold text-on-surface-60 hover:text-error transition-colors px-2 py-1"
+              className="text-xs font-bold text-on-surface-60 hover:text-error transition-colors px-2 py-1 focus-ring rounded"
             >
               Deletar
             </button>

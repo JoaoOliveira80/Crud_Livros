@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Newsreader, Manrope } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader" });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+});
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 
 export const metadata: Metadata = {
@@ -21,11 +25,11 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${newsreader.variable} ${manrope.variable} antialiased`}
+        suppressHydrationWarning
       >
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         <ErrorBoundary>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>

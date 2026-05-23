@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Livro } from "@/types/livros";
 import { livroService } from "@/services/livroService";
 import { useToast } from "@/hooks/useToast";
 import Header from "@/components/Header";
 import Toast from "@/components/Toast";
-import { useTheme } from "@/contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Configuracoes() {
+  const router = useRouter();
   const [livros, setLivros] = useState<Livro[]>([]);
-  const { theme, toggleTheme } = useTheme();
   const { aviso, mostrarAviso, fecharAviso } = useToast();
 
   useEffect(() => {
@@ -20,10 +21,11 @@ export default function Configuracoes() {
         setLivros(data);
       } catch (err) {
         console.error(err);
+        mostrarAviso("Erro ao carregar estatísticas.");
       }
     }
     carregar();
-  }, []);
+  }, [mostrarAviso]);
 
   const stats = {
     total: livros.length,
@@ -34,10 +36,7 @@ export default function Configuracoes() {
 
   return (
     <>
-      <Header
-        onNovo={() => (window.location.href = "/")}
-        onAviso={mostrarAviso}
-      />
+      <Header onNovo={() => router.push("/")} />
 
       <main className="max-w-4xl mx-auto px-6 py-16">
         <header className="mb-12">
@@ -50,15 +49,15 @@ export default function Configuracoes() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <section className="bg-surface-container-low p-8 rounded-2xl shadow-sm border border-outline-variant-10">
             <h2 className="text-2xl font-serif text-primary mb-6">
-              Perfil do Curador
+              Perfil do curador
             </h2>
             <div className="flex flex-col gap-6">
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">
-                  Nome de Exibição
+                  Nome de exibição
                 </label>
                 <p className="text-lg font-medium text-on-surface mt-1">
-                  Leitor Entusiasta
+                  Leitor entusiasta
                 </p>
               </div>
               <div>
@@ -66,24 +65,25 @@ export default function Configuracoes() {
                   Bio
                 </label>
                 <p className="text-sm text-on-surface-70 mt-1 leading-relaxed italic">
-                  &ldquo;Sempre carregando um livro, as vezes dois. Apaixonado
+                  &ldquo;Sempre carregando um livro, às vezes dois. Apaixonado
                   por ficção científica e clássicos do realismo.&rdquo;
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() =>
-                  mostrarAviso("Configurações de perfil salvas (mock)")
+                  mostrarAviso("Edição de perfil em breve.")
                 }
                 className="btn-secondary w-fit text-xs px-4 py-2 mt-2"
               >
-                Editar Perfil
+                Editar perfil
               </button>
             </div>
           </section>
 
           <section className="bg-surface-container-low p-8 rounded-2xl shadow-sm border border-outline-variant-10">
             <h2 className="text-2xl font-serif text-primary mb-6">
-              Métricas da Estante
+              Métricas da estante
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/5">
@@ -106,7 +106,7 @@ export default function Configuracoes() {
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-40">
                   Lendo
                 </span>
-                <p className="text-3xl font-serif text-primary-container mt-1">
+                <p className="text-3xl font-serif text-primary mt-1">
                   {stats.lendo}
                 </p>
               </div>
@@ -123,39 +123,22 @@ export default function Configuracoes() {
 
           <section className="md:col-span-2 bg-surface-container-low p-8 rounded-2xl shadow-sm border border-outline-variant-10">
             <h2 className="text-2xl font-serif text-primary mb-6">
-              Preferências Visuais
+              Preferências visuais
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant-10">
                 <div>
-                  <p className="font-medium text-on-surface">Modo Escuro</p>
+                  <p className="font-medium text-on-surface">Modo escuro</p>
                   <p className="text-xs text-on-surface-50 mt-0.5">
                     Ative para reduzir o cansaço visual.
                   </p>
                 </div>
-                <button
-                  onClick={toggleTheme}
-                  aria-label={
-                    theme === "dark"
-                      ? "Desativar modo escuro"
-                      : "Ativar modo escuro"
-                  }
-                  title={
-                    theme === "dark"
-                      ? "Desativar modo escuro"
-                      : "Ativar modo escuro"
-                  }
-                  className={`w-14 h-7 rounded-full relative transition-colors ${theme === "dark" ? "bg-primary" : "bg-surface-container-high"}`}
-                >
-                  <div
-                    className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${theme === "dark" ? "translate-x-8" : "translate-x-1"}`}
-                  ></div>
-                </button>
+                <ThemeToggle variant="switch" />
               </div>
               <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant-10">
                 <div>
                   <p className="font-medium text-on-surface">
-                    Idioma da Interface
+                    Idioma da interface
                   </p>
                 </div>
                 <span className="text-xs font-bold text-primary uppercase">
@@ -167,10 +150,7 @@ export default function Configuracoes() {
         </div>
       </main>
 
-      <Toast
-        aviso={aviso}
-        onFechar={fecharAviso}
-      />
+      <Toast aviso={aviso} onFechar={fecharAviso} />
     </>
   );
 }

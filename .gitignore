@@ -1,0 +1,15 @@
+# Instalações e artefatos gerados
+**/node_modules/
+**/.next/
+**/target/
+**/tsconfig.tsbuildinfo
+
+# Credenciais locais (mantenha os arquivos .env.example versionados)
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development.local
+
+# Banco H2 gerado em execução; o backup em data/legacy é intencional.
+/backend/data/*.mv.db
+/backend/data/*.trace.db

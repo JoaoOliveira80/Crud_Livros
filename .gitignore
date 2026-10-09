@@ -13,3 +13,5 @@
 # Banco H2 gerado em execução; o backup em data/legacy é intencional.
 /backend/data/*.mv.db
 /backend/data/*.trace.db
+
+/.github
